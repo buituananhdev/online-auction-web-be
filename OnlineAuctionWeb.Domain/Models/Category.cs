@@ -1,6 +1,10 @@
-﻿namespace OnlineAuctionWeb.Domain.Models
+﻿using OnlineAuctionWeb.Domain.Common;
+
+namespace OnlineAuctionWeb.Domain.Models
 {
-    internal class Category
+    public class Category : BaseDomainEntity
     {
+        public string CategoryName { get; set; }
+        public List<Product> Products { get; set; }
     }
 }
