@@ -1,12 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using OnlineAuctionWeb.Domain.Enums;
 
 namespace OnlineAuctionWeb.Domain.Models
 {
-    internal class Payment
+    public class Payment
     {
+        public int Id { get; set; }
+        public int BidId { get; set; }
+        public Bid Bid { get; set; }
+        public PaymentStatusEnum PaymentStatus { get; set; }
+        public decimal Amount { get; set; }
+        public DateTime PaymentDate { get; set; }
     }
 }

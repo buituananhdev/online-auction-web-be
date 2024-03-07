@@ -24,4 +24,10 @@
         Available = 1,
         Sold = 2
     }
+
+    public enum PaymentStatusEnum
+    {
+        Pending = 1,
+        Paid = 2
+    }
 }

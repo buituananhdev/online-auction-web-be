@@ -1,12 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace OnlineAuctionWeb.Domain.Models
+﻿namespace OnlineAuctionWeb.Domain.Models
 {
-    internal class Bid
+    public class Bid
     {
+        public int Id { get; set; }
+        public int ProductId { get; set; }
+        public Product Product { get; set; }
+        public int BidderId { get; set; }
+        public User User { get; set; }
+        public decimal BidAmount { get; set; }
+        public DateTime BidTime { get; set; }
+        public Payment Payment { get; set; }
     }
 }

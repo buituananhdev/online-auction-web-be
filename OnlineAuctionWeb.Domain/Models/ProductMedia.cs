@@ -6,7 +6,11 @@ using System.Threading.Tasks;
 
 namespace OnlineAuctionWeb.Domain.Models
 {
-    internal class ProductMedia
+    public class ProductMedia
     {
+        public int Id { get; set; }
+        public string MediaUrl { get; set; }
+        public int ProductId { get; set; }
+        public Product Product { get; set; }
     }
 }
