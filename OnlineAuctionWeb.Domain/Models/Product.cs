@@ -9,6 +9,7 @@ namespace OnlineAuctionWeb.Domain.Models
         public string Description { get; set; }
         public ConditionEnum Condition { get; set; }
         public decimal StartingPrice { get; set; }
+        public DateTime EndTime { get; set; }
         public Boolean CanReturn { get; set; }
         public ProductStatusEnum ProductStatus { get; set; }
         public Int32 ViewCount { get; set; }
