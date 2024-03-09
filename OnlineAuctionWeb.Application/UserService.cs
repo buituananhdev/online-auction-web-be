@@ -18,6 +18,7 @@ namespace OnlineAuctionWeb.Application
         Task<UserDto> UpdateAsync(int id, UserDto userDto);
         Task<UserDto> DeleteAsync(int id);
         Task<UserDto> FindUserByEmailAsync(string email);
+        Task<int> GetUserRoleByIdAsync(int id);
     }
 
     public class UserService : IUserService
@@ -129,6 +130,16 @@ namespace OnlineAuctionWeb.Application
         public Task<UserDto> UpdateAsync(int id, UserDto userDto)
         {
             throw new NotImplementedException();
+        }
+
+        public async Task<int> GetUserRoleByIdAsync(int id)
+        {
+            var role = await _context.Users
+            .Where(u => u.Id == id)
+            .Select(u => u.Role)
+            .FirstOrDefaultAsync();
+
+            return role;
         }
     }
 }

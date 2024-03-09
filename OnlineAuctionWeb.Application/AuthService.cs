@@ -40,7 +40,7 @@ namespace OnlineAuctionWeb.Application
                     throw new CustomException(StatusCodes.Status404NotFound, "Invalid credential!");
                 }
 
-                var tokenPayload = JwtUtil.GenerateAccessToken(user.Id, _configuration);
+                var tokenPayload = JwtUtil.GenerateAccessToken(user, _configuration);
                 return tokenPayload;
             }
             catch (Exception ex)
