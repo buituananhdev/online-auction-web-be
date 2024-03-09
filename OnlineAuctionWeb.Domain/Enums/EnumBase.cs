@@ -16,7 +16,8 @@
     public enum ConditionEnum
     {
         New = 1,
-        Used = 2
+        OpenBox = 2,
+        Used = 3
     }
 
     public enum ProductStatusEnum
