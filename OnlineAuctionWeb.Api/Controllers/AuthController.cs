@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using OnlineAuctionWeb.Application;
 using OnlineAuctionWeb.Domain.Dtos;
@@ -41,13 +42,13 @@ namespace OnlineAuctionWeb.Api.Controllers
         /// Handles user registration.
         /// </summary>
         /// <param name="payload">The registration payload.</param>
-        /// <returns>Returns the result of the registration process.</returns>
+        /// <returns>Returns created status code</returns>
         [HttpPost]
         [Route("register")]
         public async Task<IActionResult> Register([FromBody] RegisterDto payload)
         {
-            var result = await _authService.Register(payload);
-            return Ok(result);
+            await _authService.Register(payload);
+            return StatusCode(201);
         }
     }
 }
