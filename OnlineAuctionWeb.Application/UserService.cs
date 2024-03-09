@@ -1,19 +1,21 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using OnlineAuctionWeb.Domain;
 using OnlineAuctionWeb.Domain.Dtos;
 using OnlineAuctionWeb.Domain.Enums;
 using OnlineAuctionWeb.Domain.Models;
+using OnlineAuctionWeb.Domain.Payloads;
 using OnlineAuctionWeb.Infrastructure.Exceptions;
 
 namespace OnlineAuctionWeb.Application
 {
     public interface IUserService
     {
-        Task<List<UserDto>> GetAllAsync();
+        Task<PaginatedResult<UserDto>> GetAllAsync(int pageNumber, int pageSize);
         Task<UserDto> GetByIdAsync(int id);
         Task<Boolean> CreateAsync(UserDto userDto);
-        Task<UserDto> UpdateAsync(UserDto userDto);
+        Task<UserDto> UpdateAsync(int id, UserDto userDto);
         Task<UserDto> DeleteAsync(int id);
         Task<UserDto> FindUserByEmailAsync(string email);
     }
@@ -55,9 +57,37 @@ namespace OnlineAuctionWeb.Application
             throw new NotImplementedException();
         }
 
-        public async Task<List<UserDto>> GetAllAsync()
+        public async Task<PaginatedResult<UserDto>> GetAllAsync(int pageNumber, int pageSize)
         {
-            throw new NotImplementedException();
+            try
+            {
+                var totalUsers = await _context.Users.CountAsync();
+
+                var users = await _context.Users
+                    .Skip((pageNumber - 1) * pageSize)
+                    .Take(pageSize)
+                    .ToListAsync();
+
+                var totalPages = (int)Math.Ceiling((double)totalUsers / pageSize);
+                var meta = new PaginatedMeta
+                {
+                    CurrentPage = pageNumber,
+                    TotalPages = totalPages,
+                    PageSize = pageSize,
+                };
+                var result = new PaginatedResult<UserDto>
+                {
+                    Meta = meta,
+                    Data = _mapper.Map<List<UserDto>>(users)
+                };
+
+                return result;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Err", ex.Message);
+                throw;
+            }
         }
 
         public async Task<UserDto> GetByIdAsync(int id)
@@ -67,14 +97,14 @@ namespace OnlineAuctionWeb.Application
                 var user = await _context.Users.FindAsync(id);
                 if (user == null)
                 {
-                    throw new CustomException(400, "User not found!");
+                    throw new CustomException(StatusCodes.Status404NotFound, "User not found!");
                 }
                 return _mapper.Map<UserDto>(user);
             }
             catch (Exception ex)
             {
                 Console.WriteLine("Err", ex.Message);
-                return null;
+                throw;
             }
         }
 
@@ -85,18 +115,18 @@ namespace OnlineAuctionWeb.Application
                 var user = await _context.Users.FirstOrDefaultAsync(x => x.Email == email);
                 if (user == null)
                 {
-                    return null;
+                    throw new CustomException(StatusCodes.Status404NotFound, "User not found!");
                 }
                 return _mapper.Map<UserDto>(user);
             }
             catch (Exception ex)
             {
                 Console.WriteLine("Err", ex.Message);
-                return null;
+                throw;
             }
         }
 
-        public Task<UserDto> UpdateAsync(UserDto userDto)
+        public Task<UserDto> UpdateAsync(int id, UserDto userDto)
         {
             throw new NotImplementedException();
         }
