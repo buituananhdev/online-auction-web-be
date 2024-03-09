@@ -2,10 +2,9 @@
 using Microsoft.EntityFrameworkCore;
 using OnlineAuctionWeb.Domain;
 using OnlineAuctionWeb.Domain.Dtos;
-using OnlineAuctionWeb.Application.Exceptions;
-using OnlineAuctionWeb.Domain.Models;
-using System;
 using OnlineAuctionWeb.Domain.Enums;
+using OnlineAuctionWeb.Domain.Models;
+using OnlineAuctionWeb.Infrastructure.Exceptions;
 
 namespace OnlineAuctionWeb.Application
 {
@@ -47,7 +46,7 @@ namespace OnlineAuctionWeb.Application
             catch (Exception ex)
             {
                 Console.WriteLine("Err", ex.Message);
-                throw new CustomeException(ex.Message);
+                throw new CustomException(500, ex.Message);
             }
         }
 
@@ -66,9 +65,9 @@ namespace OnlineAuctionWeb.Application
             try
             {
                 var user = await _context.Users.FindAsync(id);
-                if(user == null)
+                if (user == null)
                 {
-                    throw new CustomeException("User not found!");
+                    throw new CustomException(400, "User not found!");
                 }
                 return _mapper.Map<UserDto>(user);
             }

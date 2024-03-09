@@ -1,10 +1,8 @@
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
 using OnlineAuctionWeb.Application;
 using OnlineAuctionWeb.Domain;
 using OnlineAuctionWeb.Domain.Mappings;
-using System.Text;
+using OnlineAuctionWeb.Infrastructure.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -20,15 +18,30 @@ builder.Services.AddApplication(builder.Configuration);
 
 var app = builder.Build();
 
-if (app.Environment.IsDevelopment())
+app.UseCors(builder =>
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+    builder.AllowAnyOrigin()
+           .AllowAnyMethod()
+           .AllowAnyHeader();
+});
+
+app.MapGet("/", async context =>
+{
+    await context.Response.WriteAsync("Hello World!");
+});
+
+app.UseSwagger();
+
+app.UseSwaggerUI(c =>
+{
+    c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");
+});
 
 app.UseHttpsRedirection();
 
 app.UseAuthorization();
+
+app.UseMiddleware<CustomExceptionMiddleware>();
 
 app.MapControllers();
 
