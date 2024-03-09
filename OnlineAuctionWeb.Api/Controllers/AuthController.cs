@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using OnlineAuctionWeb.Application;
-using OnlineAuctionWeb.Domain.Payloads;
+using OnlineAuctionWeb.Domain.Dtos;
 
 namespace OnlineAuctionWeb.Api.Controllers
 {
@@ -17,15 +17,15 @@ namespace OnlineAuctionWeb.Api.Controllers
 
         [HttpPost]
         [Route("login")]
-        public async Task<IActionResult> Login([FromBody] LoginPayload payload)
+        public async Task<IActionResult> Login([FromBody] LoginDto payload)
         {
-            var tokenPayload = await _authService.Login(payload.Email, payload.Password);
+            var tokenPayload = await _authService.Login(payload);
             return Ok(tokenPayload);
         }
 
         [HttpPost]
         [Route("register")]
-        public async Task<IActionResult> Register([FromBody] RegisterPayload payload)
+        public async Task<IActionResult> Register([FromBody] RegisterDto payload)
         {
             var result = await _authService.Register(payload);
             return Ok(result);

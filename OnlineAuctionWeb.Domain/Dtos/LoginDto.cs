@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace OnlineAuctionWeb.Domain.Payloads
+namespace OnlineAuctionWeb.Domain.Dtos
 {
-    public class LoginPayload
+    public class LoginDto
     {
         public string? Email { get; set; }
 

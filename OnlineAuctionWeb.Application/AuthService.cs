@@ -11,8 +11,8 @@ namespace OnlineAuctionWeb.Application
 {
     public interface IAuthService
     {
-        Task<TokenPayload> Login(string username, string password);
-        Task<Boolean> Register(RegisterPayload registerPayload);
+        Task<TokenPayload> Login(LoginDto loginDto);
+        Task<Boolean> Register(RegisterDto registerDto);
     }
     public class AuthService : IAuthService
     {
@@ -26,20 +26,16 @@ namespace OnlineAuctionWeb.Application
             _mapper = mapper;
         }
 
-        public async Task<TokenPayload> Login(string email, string password)
+        public async Task<TokenPayload> Login(LoginDto loginDto)
         {
             try
             {
-                var user = await _userService.FindUserByEmailAsync(email);
-                if (user == null)
-                {
-                    throw new CustomException(StatusCodes.Status404NotFound, "User not found!");
-                }
+                var user = await _userService.FindUserByEmailAsync(loginDto.Email);
                 if (user.IsActive == StatusEnum.Inactive)
                 {
                     throw new CustomException(StatusCodes.Status403Forbidden, "User is inactive!");
                 }
-                if (!BCrypt.Net.BCrypt.Verify(password, user.Password))
+                if (!BCrypt.Net.BCrypt.Verify(loginDto.Password, user.Password))
                 {
                     throw new CustomException(StatusCodes.Status404NotFound, "Invalid credential!");
                 }
@@ -54,15 +50,15 @@ namespace OnlineAuctionWeb.Application
             }
         }
 
-        public async Task<Boolean> Register(RegisterPayload registerPayload)
+        public async Task<Boolean> Register(RegisterDto registerDto)
         {
             try
             {
-                if (registerPayload.Role == RoleEnum.Admin)
+                if (registerDto.Role == RoleEnum.Admin)
                 {
                     throw new CustomException(StatusCodes.Status403Forbidden, "Can not register this role!");
                 }
-                return await _userService.CreateAsync(_mapper.Map<UserDto>(registerPayload));
+                return await _userService.CreateAsync(_mapper.Map<UserDto>(registerDto));
             }
             catch (Exception ex)
             {
