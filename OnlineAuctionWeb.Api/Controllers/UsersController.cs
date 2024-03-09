@@ -1,7 +1,8 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using OnlineAuctionWeb.Application;
 using OnlineAuctionWeb.Domain.Dtos;
+using OnlineAuctionWeb.Domain.Enums;
+using OnlineAuctionWeb.Infrastructure.Authorize;
 
 namespace OnlineAuctionWeb.Api.Controllers
 {
@@ -16,6 +17,7 @@ namespace OnlineAuctionWeb.Api.Controllers
         }
 
         [HttpGet]
+        [CustomAuthorize(RequiredRoles = new int[] { (int)RoleEnum.Admin })]
         public async Task<IActionResult> GetUsers([FromQuery] int page = 1, [FromQuery] int pageSize = 10)
         {
             var users = await _userService.GetAllAsync(page, pageSize);
@@ -31,6 +33,7 @@ namespace OnlineAuctionWeb.Api.Controllers
         }
 
         [HttpPost]
+        [CustomAuthorize(RequiredRoles = new int[] { (int)RoleEnum.Admin })]
         public async Task<IActionResult> CreateUser([FromBody] UserDto userDto)
         {
             var user = await _userService.CreateAsync(userDto);
@@ -39,6 +42,7 @@ namespace OnlineAuctionWeb.Api.Controllers
 
         [HttpPut]
         [Route("{id}")]
+        [CustomAuthorize(RequiredRoles = new int[] { (int)RoleEnum.Admin })]
         public async Task<IActionResult> UpdateUser(int id, [FromBody] UserDto userDto)
         {
             var user = await _userService.UpdateAsync(id, userDto);
@@ -47,10 +51,11 @@ namespace OnlineAuctionWeb.Api.Controllers
 
         [HttpDelete]
         [Route("{id}")]
+        [CustomAuthorize(RequiredRoles = new int[] { (int)RoleEnum.Admin })]
         public async Task<IActionResult> DeleteUser(int id)
         {
             await _userService.DeleteAsync(id);
             return Ok();
-        }   
+        }
     }
 }

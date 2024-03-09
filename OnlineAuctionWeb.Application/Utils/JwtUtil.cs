@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
+using OnlineAuctionWeb.Domain.Dtos;
 using OnlineAuctionWeb.Domain.Payloads;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -14,7 +15,7 @@ namespace OnlineAuctionWeb.Application.Utils
             return new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey));
         }
 
-        private static TokenPayload GenerateToken(int userId, string secretKey, double expirationDays)
+        private static TokenPayload GenerateToken(UserDto user, string secretKey, double expirationDays)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
             var key = GetSymmetricSecurityKey(secretKey);
@@ -25,7 +26,9 @@ namespace OnlineAuctionWeb.Application.Utils
             {
                 Subject = new ClaimsIdentity(new Claim[]
                 {
-                    new Claim("ID", userId.ToString()),
+                    new Claim("ID", user.Id.ToString()),
+                    new Claim(ClaimTypes.Role, user.Role.ToString()),
+
                 }),
                 Expires = DateTime.UtcNow.AddDays(expirationDays),
                 SigningCredentials = creds
@@ -36,18 +39,18 @@ namespace OnlineAuctionWeb.Application.Utils
             var expiresIn = DateTimeOffset.UtcNow.AddDays(expirationDays);
 
             var token = new TokenPayload();
-            token.UserId = userId;
+            token.UserId = user.Id;
             token.AccessToken = tokenHandler.WriteToken(jwtToken);
             token.ExpirationTime = expiresIn.ToUnixTimeSeconds();
             token.CreatedAt = DateTime.Now;
             return token;
         }
 
-        public static TokenPayload GenerateAccessToken(int userId, IConfiguration configuration)
+        public static TokenPayload GenerateAccessToken(UserDto user, IConfiguration configuration)
         {
             var secretKey = configuration.GetSection("JwtSettings:Secret").Value;
             var expirationTime = double.Parse(configuration.GetSection("JwtSettings:ExpirationTime").Value);
-            return GenerateToken(userId, secretKey, expirationTime);
+            return GenerateToken(user, secretKey, expirationTime);
         }
     }
 }
