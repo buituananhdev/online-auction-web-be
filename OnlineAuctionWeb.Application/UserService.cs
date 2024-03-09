@@ -14,10 +14,11 @@ namespace OnlineAuctionWeb.Application
     {
         Task<PaginatedResult<UserDto>> GetAllAsync(int pageNumber, int pageSize);
         Task<UserDto> GetByIdAsync(int id);
-        Task<Boolean> CreateAsync(UserDto userDto);
+        Task CreateAsync(CreateUserDto userDto);
         Task<UserDto> UpdateAsync(int id, UserDto userDto);
         Task<UserDto> DeleteAsync(int id);
         Task<UserDto> FindUserByEmailAsync(string email);
+        Task<bool> UserExistsByEmailAsync(string email);
         Task<int> GetUserRoleByIdAsync(int id);
     }
 
@@ -30,21 +31,25 @@ namespace OnlineAuctionWeb.Application
             _context = contex;
             _mapper = mapper;
         }
-        public async Task<Boolean> CreateAsync(UserDto userDto)
+        public async Task CreateAsync(CreateUserDto userDto)
         {
             try
             {
+                if (await UserExistsByEmailAsync(userDto.Email))
+                {
+                    throw new CustomException(StatusCodes.Status400BadRequest, "Email already exists!");
+                }
+
                 User user = _mapper.Map<User>(userDto);
                 string hashedPassword = BCrypt.Net.BCrypt.HashPassword(user.Password);
                 user.Password = hashedPassword;
                 user.IsActive = StatusEnum.Active;
+                if(string.IsNullOrEmpty(user.FullName))
+                {
+                    user.FullName = "User@" + Guid.NewGuid().ToString().Substring(0, 6);
+                }
                 _context.Users.Add(user);
                 await _context.SaveChangesAsync();
-                if (await FindUserByEmailAsync(user.Email) != null)
-                {
-                    return true;
-                }
-                return false;
             }
             catch (Exception ex)
             {
@@ -121,6 +126,11 @@ namespace OnlineAuctionWeb.Application
                 Console.WriteLine("Err", ex.Message);
                 throw;
             }
+        }
+
+        public async Task<bool> UserExistsByEmailAsync(string email)
+        {
+            return await _context.Users.AnyAsync(u => u.Email == email);
         }
 
         public Task<UserDto> UpdateAsync(int id, UserDto userDto)

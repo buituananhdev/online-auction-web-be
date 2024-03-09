@@ -10,18 +10,8 @@ namespace OnlineAuctionWeb.Domain.Mappings
         public AutoMapperProfile()
         {
             CreateMap<User, UserDto>().ReverseMap();
-            CreateMap<RegisterDto, UserDto>()
-                .ForMember(dest => dest.FullName, opt => opt.MapFrom(src => src.FullName))
-                .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.Email))
-                .ForMember(dest => dest.Password, opt => opt.MapFrom(src => src.Password))
-                .ForMember(dest => dest.Role, opt => opt.MapFrom(src => src.Role))
-                .ForMember(dest => dest.IsActive, opt => opt.MapFrom(_ => StatusEnum.Active));
-
-            CreateMap<UserDto, RegisterDto>()
-                .ForMember(dest => dest.FullName, opt => opt.MapFrom(src => src.FullName))
-                .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.Email))
-                .ForMember(dest => dest.Password, opt => opt.MapFrom(src => src.Password))
-                .ForMember(dest => dest.Role, opt => opt.MapFrom(src => src.Role));
+            CreateMap<CreateUserDto, RegisterDto>().ReverseMap();
+            CreateMap<User, CreateUserDto>().ReverseMap();
         }
     }
 }
