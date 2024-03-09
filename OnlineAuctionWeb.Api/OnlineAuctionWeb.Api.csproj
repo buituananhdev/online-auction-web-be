@@ -22,8 +22,4 @@
     <ProjectReference Include="..\OnlineAuctionWeb.Infrastructure\OnlineAuctionWeb.Infrastructure.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Middlewares\" />
-  </ItemGroup>
-
 </Project>
