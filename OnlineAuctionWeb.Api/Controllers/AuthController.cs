@@ -19,32 +19,16 @@ namespace OnlineAuctionWeb.Api.Controllers
         [Route("login")]
         public async Task<IActionResult> Login([FromBody] LoginPayload payload)
         {
-            try
-            {
-                var tokenPayload = await _authService.Login(payload.Email, payload.Password);
-                return Ok(tokenPayload);
-            }
-            catch (Exception ex)
-            {
-
-                Console.WriteLine("Err", ex.ToString());
-                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
-            }
+            var tokenPayload = await _authService.Login(payload.Email, payload.Password);
+            return Ok(tokenPayload);
         }
 
         [HttpPost]
         [Route("register")]
         public async Task<IActionResult> Register([FromBody] RegisterPayload payload)
         {
-            try
-            {
-                var result = await _authService.Register(payload);
-                return Ok(result);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
-            }
+            var result = await _authService.Register(payload);
+            return Ok(result);
         }
     }
 }

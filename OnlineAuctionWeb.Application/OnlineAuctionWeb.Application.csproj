@@ -8,10 +8,12 @@
 
   <ItemGroup>
     <ProjectReference Include="..\OnlineAuctionWeb.Domain\OnlineAuctionWeb.Domain.csproj" />
+    <ProjectReference Include="..\OnlineAuctionWeb.Infrastructure\OnlineAuctionWeb.Infrastructure.csproj" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="BCrypt.Net-Next" Version="4.0.3" />
+    <PackageReference Include="Microsoft.AspNet.WebApi.Core" Version="5.3.0" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="7.0.16" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Core" Version="2.2.5" />
   </ItemGroup>
