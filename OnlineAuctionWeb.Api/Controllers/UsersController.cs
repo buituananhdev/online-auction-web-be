@@ -6,16 +6,30 @@ using OnlineAuctionWeb.Infrastructure.Authorize;
 
 namespace OnlineAuctionWeb.Api.Controllers
 {
+    /// <summary>
+    /// Controller for managing user-related operations.
+    /// </summary>
     [Route("api/users")]
     [ApiController]
     public class UsersController : ControllerBase
     {
         private readonly IUserService _userService;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="UsersController"/> class.
+        /// </summary>
+        /// <param name="userService">The user service.</param>
         public UsersController(IUserService userService)
         {
             _userService = userService;
         }
 
+        /// <summary>
+        /// Gets a paginated list of users.
+        /// </summary>
+        /// <param name="page">The page number (default is 1).</param>
+        /// <param name="pageSize">The number of users per page (default is 10).</param>
+        /// <returns>Returns a paginated list of users.</returns>
         [HttpGet]
         [CustomAuthorize(RequiredRoles = new int[] { (int)RoleEnum.Admin })]
         public async Task<IActionResult> GetUsers([FromQuery] int page = 1, [FromQuery] int pageSize = 10)
@@ -24,6 +38,11 @@ namespace OnlineAuctionWeb.Api.Controllers
             return Ok(users);
         }
 
+        /// <summary>
+        /// Gets a user by ID.
+        /// </summary>
+        /// <param name="id">The ID of the user.</param>
+        /// <returns>Returns the user with the specified ID.</returns>
         [HttpGet]
         [Route("{id}")]
         public async Task<IActionResult> GetUserById(int id)
@@ -32,6 +51,11 @@ namespace OnlineAuctionWeb.Api.Controllers
             return Ok(user);
         }
 
+        /// <summary>
+        /// Creates a new user.
+        /// </summary>
+        /// <param name="userDto">The data for creating the new user.</param>
+        /// <returns>Returns the created user.</returns>
         [HttpPost]
         [CustomAuthorize(RequiredRoles = new int[] { (int)RoleEnum.Admin })]
         public async Task<IActionResult> CreateUser([FromBody] UserDto userDto)
@@ -40,6 +64,12 @@ namespace OnlineAuctionWeb.Api.Controllers
             return Ok(user);
         }
 
+        /// <summary>
+        /// Updates an existing user.
+        /// </summary>
+        /// <param name="id">The ID of the user to update.</param>
+        /// <param name="userDto">The updated user data.</param>
+        /// <returns>Returns the updated user.</returns>
         [HttpPut]
         [Route("{id}")]
         [CustomAuthorize(RequiredRoles = new int[] { (int)RoleEnum.Admin })]
@@ -49,13 +79,18 @@ namespace OnlineAuctionWeb.Api.Controllers
             return Ok(user);
         }
 
+        /// <summary>
+        /// Deletes a user by ID.
+        /// </summary>
+        /// <param name="id">The ID of the user to delete.</param>
+        /// <returns>Returns a success message upon successful deletion.</returns>
         [HttpDelete]
         [Route("{id}")]
         [CustomAuthorize(RequiredRoles = new int[] { (int)RoleEnum.Admin })]
         public async Task<IActionResult> DeleteUser(int id)
         {
             await _userService.DeleteAsync(id);
-            return Ok();
+            return Ok(new { Message = "User deleted successfully." });
         }
     }
 }
