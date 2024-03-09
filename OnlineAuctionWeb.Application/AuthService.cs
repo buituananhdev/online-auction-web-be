@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
-using OnlineAuctionWeb.Application.Utils;
+using OnlineAuctionWeb.Infrastructure.Utils;
 using OnlineAuctionWeb.Domain.Dtos;
 using OnlineAuctionWeb.Domain.Enums;
 using OnlineAuctionWeb.Domain.Payloads;
@@ -50,7 +50,7 @@ namespace OnlineAuctionWeb.Application
             catch (Exception ex)
             {
                 Console.WriteLine("Err", ex);
-                throw new Exception();
+                throw;
             }
         }
 
@@ -58,17 +58,12 @@ namespace OnlineAuctionWeb.Application
         {
             try
             {
-                if (await _userService.FindUserByEmailAsync(registerDto.Email) != null)
-                {
-                    throw new CustomException(StatusCodes.Status400BadRequest, "Email already exists!");
-                }
-
                 if (registerDto.Role == RoleEnum.Admin || !Enum.IsDefined(typeof(RoleEnum), registerDto.Role))
                 {
                     throw new CustomException(StatusCodes.Status400BadRequest, "Invalid role specified!");
                 }
 
-                await _userService.CreateAsync(_mapper.Map<UserDto>(registerDto));
+                await _userService.CreateAsync(_mapper.Map<CreateUserDto>(registerDto));
             }
             catch (Exception ex)
             {

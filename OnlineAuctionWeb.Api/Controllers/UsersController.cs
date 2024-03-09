@@ -58,10 +58,10 @@ namespace OnlineAuctionWeb.Api.Controllers
         /// <returns>Returns the created user.</returns>
         [HttpPost]
         [CustomAuthorize(RequiredRoles = new int[] { (int)RoleEnum.Admin })]
-        public async Task<IActionResult> CreateUser([FromBody] UserDto userDto)
+        public async Task<IActionResult> CreateUser([FromBody] CreateUserDto userDto)
         {
-            var user = await _userService.CreateAsync(userDto);
-            return Ok(user);
+            await _userService.CreateAsync(userDto);
+            return StatusCode(201);
         }
 
         /// <summary>

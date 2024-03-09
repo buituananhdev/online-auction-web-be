@@ -1,21 +1,18 @@
 ﻿using OnlineAuctionWeb.Domain.Enums;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.ComponentModel.DataAnnotations;
 
 namespace OnlineAuctionWeb.Domain.Dtos
 {
     public class RegisterDto
     {
+        [Required(ErrorMessage = "Email is required")]
+        [EmailAddress(ErrorMessage = "Invalid email format")]
         public string? Email { get; set; }
 
+        [StringLength(50, MinimumLength = 6, ErrorMessage = "Password must be between 6 and 50 characters")]
         public string? Password { get; set; }
 
-        public string? FullName { get; set; }
-
+        [Required(ErrorMessage = "Role is required")]
         public RoleEnum? Role { get; set; }
-
     }
 }
