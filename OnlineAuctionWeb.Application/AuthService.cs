@@ -12,7 +12,7 @@ namespace OnlineAuctionWeb.Application
     public interface IAuthService
     {
         Task<TokenPayload> Login(LoginDto loginDto);
-        Task<Boolean> Register(RegisterDto registerDto);
+        Task Register(RegisterDto registerDto);
     }
     public class AuthService : IAuthService
     {
@@ -31,6 +31,10 @@ namespace OnlineAuctionWeb.Application
             try
             {
                 var user = await _userService.FindUserByEmailAsync(loginDto.Email);
+                if(user == null)
+                {
+                    throw new CustomException(StatusCodes.Status404NotFound, "User not found!");
+                }
                 if (user.IsActive == StatusEnum.Inactive)
                 {
                     throw new CustomException(StatusCodes.Status403Forbidden, "User is inactive!");
@@ -50,20 +54,26 @@ namespace OnlineAuctionWeb.Application
             }
         }
 
-        public async Task<Boolean> Register(RegisterDto registerDto)
+        public async Task Register(RegisterDto registerDto)
         {
             try
             {
-                if (registerDto.Role == RoleEnum.Admin)
+                if (await _userService.FindUserByEmailAsync(registerDto.Email) != null)
                 {
-                    throw new CustomException(StatusCodes.Status403Forbidden, "Can not register this role!");
+                    throw new CustomException(StatusCodes.Status400BadRequest, "Email already exists!");
                 }
-                return await _userService.CreateAsync(_mapper.Map<UserDto>(registerDto));
+
+                if (registerDto.Role == RoleEnum.Admin || !Enum.IsDefined(typeof(RoleEnum), registerDto.Role))
+                {
+                    throw new CustomException(StatusCodes.Status400BadRequest, "Invalid role specified!");
+                }
+
+                await _userService.CreateAsync(_mapper.Map<UserDto>(registerDto));
             }
             catch (Exception ex)
             {
                 Console.WriteLine("Err", ex);
-                throw new Exception();
+                throw;
             }
         }
     }

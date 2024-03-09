@@ -114,10 +114,6 @@ namespace OnlineAuctionWeb.Application
             try
             {
                 var user = await _context.Users.FirstOrDefaultAsync(x => x.Email == email);
-                if (user == null)
-                {
-                    throw new CustomException(StatusCodes.Status404NotFound, "User not found!");
-                }
                 return _mapper.Map<UserDto>(user);
             }
             catch (Exception ex)
