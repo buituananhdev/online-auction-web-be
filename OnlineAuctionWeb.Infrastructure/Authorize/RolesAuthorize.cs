@@ -10,11 +10,11 @@ using System.Security.Claims;
 namespace OnlineAuctionWeb.Infrastructure.Authorize
 {
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, AllowMultiple = true, Inherited = true)]
-    public class CustomAuthorizeAttribute : AuthorizeAttribute, IAsyncAuthorizationFilter
+    public class RolesAuthorize : AuthorizeAttribute, IAsyncAuthorizationFilter
     {
         public int[] RequiredRoles { get; set; }
 
-        public CustomAuthorizeAttribute(params int[] roles)
+        public RolesAuthorize(params int[] roles)
         {
             RequiredRoles = roles;
         }

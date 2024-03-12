@@ -16,7 +16,7 @@ namespace OnlineAuctionWeb.Application
         Task<UserDto> GetByIdAsync(int id);
         Task CreateAsync(CreateUserDto userDto);
         Task<UserDto> UpdateAsync(int id, UserDto userDto);
-        Task<UserDto> DeleteAsync(int id);
+        Task DeleteAsync(int id);
         Task<UserDto> FindUserByEmailAsync(string email);
         Task<bool> UserExistsByEmailAsync(string email);
         Task<int> GetUserRoleByIdAsync(int id);
@@ -58,9 +58,16 @@ namespace OnlineAuctionWeb.Application
             }
         }
 
-        public Task<UserDto> DeleteAsync(int id)
+        public async Task DeleteAsync(int id)
         {
-            throw new NotImplementedException();
+            var user = await _context.Users.FindAsync(id);
+            if (user == null)
+            {
+                throw new CustomException(StatusCodes.Status404NotFound, "User not found!");
+            }
+
+            user.IsActive = StatusEnum.Inactive;
+            await _context.SaveChangesAsync();
         }
 
         public async Task<PaginatedResult<UserDto>> GetAllAsync(int pageNumber, int pageSize)

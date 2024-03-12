@@ -31,7 +31,7 @@ namespace OnlineAuctionWeb.Api.Controllers
         /// <param name="pageSize">The number of users per page (default is 10).</param>
         /// <returns>Returns a paginated list of users.</returns>
         [HttpGet]
-        [CustomAuthorize(RequiredRoles = new int[] { (int)RoleEnum.Admin })]
+        [RolesAuthorize(RequiredRoles = new int[] { (int)RoleEnum.Admin })]
         public async Task<IActionResult> GetUsers([FromQuery] int page = 1, [FromQuery] int pageSize = 10)
         {
             var users = await _userService.GetAllAsync(page, pageSize);
@@ -57,7 +57,7 @@ namespace OnlineAuctionWeb.Api.Controllers
         /// <param name="userDto">The data for creating the new user.</param>
         /// <returns>Returns the created user.</returns>
         [HttpPost]
-        [CustomAuthorize(RequiredRoles = new int[] { (int)RoleEnum.Admin })]
+        [RolesAuthorize(RequiredRoles = new int[] { (int)RoleEnum.Admin })]
         public async Task<IActionResult> CreateUser([FromBody] CreateUserDto userDto)
         {
             await _userService.CreateAsync(userDto);
@@ -72,7 +72,7 @@ namespace OnlineAuctionWeb.Api.Controllers
         /// <returns>Returns the updated user.</returns>
         [HttpPut]
         [Route("{id}")]
-        [CustomAuthorize(RequiredRoles = new int[] { (int)RoleEnum.Admin })]
+        [RolesAuthorize(RequiredRoles = new int[] { (int)RoleEnum.Admin })]
         public async Task<IActionResult> UpdateUser(int id, [FromBody] UserDto userDto)
         {
             var user = await _userService.UpdateAsync(id, userDto);
@@ -84,9 +84,9 @@ namespace OnlineAuctionWeb.Api.Controllers
         /// </summary>
         /// <param name="id">The ID of the user to delete.</param>
         /// <returns>Returns a success message upon successful deletion.</returns>
-        [HttpDelete]
+        [HttpPatch]
         [Route("{id}")]
-        [CustomAuthorize(RequiredRoles = new int[] { (int)RoleEnum.Admin })]
+        [RolesAuthorize(RequiredRoles = new int[] { (int)RoleEnum.Admin })]
         public async Task<IActionResult> DeleteUser(int id)
         {
             await _userService.DeleteAsync(id);
