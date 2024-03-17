@@ -5,9 +5,6 @@ namespace OnlineAuctionWeb.Domain.Dtos
 {
     public class CreateUserDto
     {
-        [StringLength(100, ErrorMessage = "Full name cannot exceed 100 characters")]
-        public string FullName { get; set; } = string.Empty;
-
         [Required(ErrorMessage = "Email is required")]
         [EmailAddress(ErrorMessage = "Invalid email format")]
         public string Email { get; set; }

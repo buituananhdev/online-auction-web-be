@@ -1,8 +1,12 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authentication.Google;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using OnlineAuctionWeb.Application;
 using OnlineAuctionWeb.Domain.Dtos;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 namespace OnlineAuctionWeb.Api.Controllers
 {
@@ -29,7 +33,6 @@ namespace OnlineAuctionWeb.Api.Controllers
         /// </summary>
         /// <param name="payload">The login payload.</param>
         /// <returns>Returns the authentication token payload upon successful login.</returns>
-        [HttpPost]
         [HttpPost]
         [Route("login")]
         public async Task<IActionResult> Login([FromBody] LoginDto payload)
