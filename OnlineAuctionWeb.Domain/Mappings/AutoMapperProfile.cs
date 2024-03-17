@@ -12,6 +12,12 @@ namespace OnlineAuctionWeb.Domain.Mappings
             CreateMap<User, UserDto>().ReverseMap();
             CreateMap<CreateUserDto, RegisterDto>().ReverseMap();
             CreateMap<User, CreateUserDto>().ReverseMap();
+
+            CreateMap<Product, ProductDto>().ReverseMap();
+            CreateMap<CreateProductDto, Product>().ReverseMap();
+
+            CreateMap<Category, CreateCategoryDto>().ReverseMap();
+            CreateMap<Category, CategoryDto>().ReverseMap();
         }
     }
 }
