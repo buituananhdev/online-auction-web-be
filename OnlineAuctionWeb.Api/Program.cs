@@ -19,7 +19,7 @@ builder.Services.AddEndpointsApiExplorer();
 // Thêm dòng sau để thêm token JWT
 builder.Services.AddSwaggerGen(c =>
 {
-    c.SwaggerDoc("v1", new OpenApiInfo { Title = "My API", Version = "v1" });
+    c.SwaggerDoc("v1", new OpenApiInfo { Title = "PBL5 AUCTION WEB API", Version = "v1" });
 
     c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
@@ -75,7 +75,7 @@ app.MapGet("/", async context =>
 app.UseSwagger();
 app.UseSwaggerUI(c =>
 {
-    c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");
+    c.SwaggerEndpoint("/swagger/v1/swagger.json", "PBL5 AUCTION WEB API");
     c.InjectJavascript("/custom.js");
 });
 

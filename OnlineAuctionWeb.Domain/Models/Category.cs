@@ -7,6 +7,6 @@ namespace OnlineAuctionWeb.Domain.Models
     {
         public string CategoryName { get; set; }
         public StatusEnum Status { get; set; } = StatusEnum.Active;
-        public List<Product> Products { get; set; }
+        public List<Auction> Products { get; set; }
     }
 }
