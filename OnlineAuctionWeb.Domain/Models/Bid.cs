@@ -4,7 +4,7 @@
     {
         public int Id { get; set; }
         public int ProductId { get; set; }
-        public Product Product { get; set; }
+        public Auction Auction { get; set; }
         public int BidderId { get; set; }
         public User User { get; set; }
         public decimal BidAmount { get; set; }

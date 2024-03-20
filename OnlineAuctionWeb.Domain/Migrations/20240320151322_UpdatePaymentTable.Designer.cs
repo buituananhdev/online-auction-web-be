@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using OnlineAuctionWeb.Domain;
 
@@ -11,9 +12,11 @@ using OnlineAuctionWeb.Domain;
 namespace OnlineAuctionWeb.Domain.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20240320151322_UpdatePaymentTable")]
+    partial class UpdatePaymentTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -22,95 +25,6 @@ namespace OnlineAuctionWeb.Domain.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("OnlineAuctionWeb.Domain.Models.Auction", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<bool>("CanReturn")
-                        .HasColumnType("bit");
-
-                    b.Property<int>("CategoryId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Condition")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("DateCreated")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("EndTime")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("LastModifiedBy")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("LastModifiedDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<decimal>("MaxPrice")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<string>("ProductName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<int>("ProductStatus")
-                        .HasColumnType("int");
-
-                    b.Property<int>("SellerId")
-                        .HasColumnType("int");
-
-                    b.Property<decimal>("StartingPrice")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<int>("ViewCount")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CategoryId");
-
-                    b.HasIndex("SellerId");
-
-                    b.HasIndex("ProductName", "ProductStatus", "DateCreated");
-
-                    b.ToTable("Auctions");
-                });
-
-            modelBuilder.Entity("OnlineAuctionWeb.Domain.Models.AuctionMedia", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("AuctionId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("MediaUrl")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("ProductId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("AuctionId");
-
-                    b.ToTable("AuctionMedias");
-                });
-
             modelBuilder.Entity("OnlineAuctionWeb.Domain.Models.Bid", b =>
                 {
                     b.Property<int>("Id")
@@ -118,9 +32,6 @@ namespace OnlineAuctionWeb.Domain.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("AuctionId")
-                        .HasColumnType("int");
 
                     b.Property<decimal>("BidAmount")
                         .HasColumnType("decimal(18,2)");
@@ -139,7 +50,7 @@ namespace OnlineAuctionWeb.Domain.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("AuctionId");
+                    b.HasIndex("ProductId");
 
                     b.HasIndex("UserId");
 
@@ -156,7 +67,7 @@ namespace OnlineAuctionWeb.Domain.Migrations
 
                     b.Property<string>("CategoryName")
                         .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("DateCreated")
                         .HasColumnType("datetime2");
@@ -172,9 +83,6 @@ namespace OnlineAuctionWeb.Domain.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("CategoryName")
-                        .IsUnique();
 
                     b.ToTable("Categories");
                 });
@@ -212,10 +120,9 @@ namespace OnlineAuctionWeb.Domain.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ToUserId");
+                    b.HasIndex("FromUserId");
 
-                    b.HasIndex("FromUserId", "ToUserId")
-                        .IsUnique();
+                    b.HasIndex("ToUserId");
 
                     b.ToTable("Feedbacks");
                 });
@@ -259,16 +166,6 @@ namespace OnlineAuctionWeb.Domain.Migrations
                     b.Property<int>("BidId")
                         .HasColumnType("int");
 
-                    b.Property<DateTime>("DateCreated")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("LastModifiedBy")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("LastModifiedDate")
-                        .HasColumnType("datetime2");
-
                     b.Property<string>("MerchantId")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -291,6 +188,87 @@ namespace OnlineAuctionWeb.Domain.Migrations
                     b.ToTable("Payments");
                 });
 
+            modelBuilder.Entity("OnlineAuctionWeb.Domain.Models.Auction", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<bool>("CanReturn")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("CategoryId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Condition")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("DateCreated")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("EndTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("LastModifiedBy")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("LastModifiedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ProductName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("ProductStatus")
+                        .HasColumnType("int");
+
+                    b.Property<int>("SellerId")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("StartingPrice")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int>("ViewCount")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CategoryId");
+
+                    b.HasIndex("SellerId");
+
+                    b.ToTable("Products");
+                });
+
+            modelBuilder.Entity("OnlineAuctionWeb.Domain.Models.ProductMedia", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("MediaUrl")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("ProductId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ProductId");
+
+                    b.ToTable("ProductMedias");
+                });
+
             modelBuilder.Entity("OnlineAuctionWeb.Domain.Models.User", b =>
                 {
                     b.Property<int>("Id")
@@ -308,11 +286,14 @@ namespace OnlineAuctionWeb.Domain.Migrations
 
                     b.Property<string>("Email")
                         .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("FullName")
                         .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("IsActive")
+                        .HasColumnType("int");
 
                     b.Property<string>("LastModifiedBy")
                         .IsRequired()
@@ -332,13 +313,7 @@ namespace OnlineAuctionWeb.Domain.Migrations
                     b.Property<int>("Role")
                         .HasColumnType("int");
 
-                    b.Property<int>("Status")
-                        .HasColumnType("int");
-
                     b.HasKey("Id");
-
-                    b.HasIndex("Email", "FullName", "Status", "DateCreated")
-                        .IsUnique();
 
                     b.ToTable("Users");
                 });
@@ -361,74 +336,11 @@ namespace OnlineAuctionWeb.Domain.Migrations
                     b.ToTable("UserNotifications");
                 });
 
-            modelBuilder.Entity("OnlineAuctionWeb.Domain.Models.WatchList", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("AuctionId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("DateCreated")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("LastModifiedBy")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("LastModifiedDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("AuctionId");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("WatchList");
-                });
-
-            modelBuilder.Entity("OnlineAuctionWeb.Domain.Models.Auction", b =>
-                {
-                    b.HasOne("OnlineAuctionWeb.Domain.Models.Category", "Category")
-                        .WithMany("Products")
-                        .HasForeignKey("CategoryId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("OnlineAuctionWeb.Domain.Models.User", "Seller")
-                        .WithMany("Products")
-                        .HasForeignKey("SellerId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Category");
-
-                    b.Navigation("Seller");
-                });
-
-            modelBuilder.Entity("OnlineAuctionWeb.Domain.Models.AuctionMedia", b =>
-                {
-                    b.HasOne("OnlineAuctionWeb.Domain.Models.Auction", "Auction")
-                        .WithMany("ProductMedias")
-                        .HasForeignKey("AuctionId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Auction");
-                });
-
             modelBuilder.Entity("OnlineAuctionWeb.Domain.Models.Bid", b =>
                 {
                     b.HasOne("OnlineAuctionWeb.Domain.Models.Auction", "Auction")
                         .WithMany("Bids")
-                        .HasForeignKey("AuctionId")
+                        .HasForeignKey("ProductId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -473,6 +385,36 @@ namespace OnlineAuctionWeb.Domain.Migrations
                     b.Navigation("Bid");
                 });
 
+            modelBuilder.Entity("OnlineAuctionWeb.Domain.Models.Auction", b =>
+                {
+                    b.HasOne("OnlineAuctionWeb.Domain.Models.Category", "Category")
+                        .WithMany("Products")
+                        .HasForeignKey("CategoryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("OnlineAuctionWeb.Domain.Models.User", "Seller")
+                        .WithMany("Products")
+                        .HasForeignKey("SellerId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Category");
+
+                    b.Navigation("Seller");
+                });
+
+            modelBuilder.Entity("OnlineAuctionWeb.Domain.Models.ProductMedia", b =>
+                {
+                    b.HasOne("OnlineAuctionWeb.Domain.Models.Auction", "Auction")
+                        .WithMany("ProductMedias")
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Auction");
+                });
+
             modelBuilder.Entity("OnlineAuctionWeb.Domain.Models.UserNotification", b =>
                 {
                     b.HasOne("OnlineAuctionWeb.Domain.Models.Notification", "Notification")
@@ -492,32 +434,6 @@ namespace OnlineAuctionWeb.Domain.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("OnlineAuctionWeb.Domain.Models.WatchList", b =>
-                {
-                    b.HasOne("OnlineAuctionWeb.Domain.Models.Auction", "Auction")
-                        .WithMany()
-                        .HasForeignKey("AuctionId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("OnlineAuctionWeb.Domain.Models.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Auction");
-
-                    b.Navigation("User");
-                });
-
-            modelBuilder.Entity("OnlineAuctionWeb.Domain.Models.Auction", b =>
-                {
-                    b.Navigation("Bids");
-
-                    b.Navigation("ProductMedias");
-                });
-
             modelBuilder.Entity("OnlineAuctionWeb.Domain.Models.Bid", b =>
                 {
                     b.Navigation("Payment")
@@ -532,6 +448,13 @@ namespace OnlineAuctionWeb.Domain.Migrations
             modelBuilder.Entity("OnlineAuctionWeb.Domain.Models.Notification", b =>
                 {
                     b.Navigation("UserNotifications");
+                });
+
+            modelBuilder.Entity("OnlineAuctionWeb.Domain.Models.Auction", b =>
+                {
+                    b.Navigation("Bids");
+
+                    b.Navigation("ProductMedias");
                 });
 
             modelBuilder.Entity("OnlineAuctionWeb.Domain.Models.User", b =>

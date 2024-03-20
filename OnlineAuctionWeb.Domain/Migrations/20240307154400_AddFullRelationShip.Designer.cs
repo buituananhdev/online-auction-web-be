@@ -178,7 +178,7 @@ namespace OnlineAuctionWeb.Domain.Migrations
                     b.ToTable("Payments");
                 });
 
-            modelBuilder.Entity("OnlineAuctionWeb.Domain.Models.Product", b =>
+            modelBuilder.Entity("OnlineAuctionWeb.Domain.Models.Auction", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -307,7 +307,7 @@ namespace OnlineAuctionWeb.Domain.Migrations
 
             modelBuilder.Entity("OnlineAuctionWeb.Domain.Models.Bid", b =>
                 {
-                    b.HasOne("OnlineAuctionWeb.Domain.Models.Product", "Product")
+                    b.HasOne("OnlineAuctionWeb.Domain.Models.Auction", "Auction")
                         .WithMany("Bids")
                         .HasForeignKey("ProductId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -319,7 +319,7 @@ namespace OnlineAuctionWeb.Domain.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Product");
+                    b.Navigation("Auction");
 
                     b.Navigation("User");
                 });
@@ -361,7 +361,7 @@ namespace OnlineAuctionWeb.Domain.Migrations
                     b.Navigation("Bid");
                 });
 
-            modelBuilder.Entity("OnlineAuctionWeb.Domain.Models.Product", b =>
+            modelBuilder.Entity("OnlineAuctionWeb.Domain.Models.Auction", b =>
                 {
                     b.HasOne("OnlineAuctionWeb.Domain.Models.Category", "Category")
                         .WithMany("Products")
@@ -382,13 +382,13 @@ namespace OnlineAuctionWeb.Domain.Migrations
 
             modelBuilder.Entity("OnlineAuctionWeb.Domain.Models.ProductMedia", b =>
                 {
-                    b.HasOne("OnlineAuctionWeb.Domain.Models.Product", "Product")
+                    b.HasOne("OnlineAuctionWeb.Domain.Models.Auction", "Auction")
                         .WithMany("ProductMedias")
                         .HasForeignKey("ProductId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Product");
+                    b.Navigation("Auction");
                 });
 
             modelBuilder.Entity("OnlineAuctionWeb.Domain.Models.Bid", b =>
@@ -402,7 +402,7 @@ namespace OnlineAuctionWeb.Domain.Migrations
                     b.Navigation("Products");
                 });
 
-            modelBuilder.Entity("OnlineAuctionWeb.Domain.Models.Product", b =>
+            modelBuilder.Entity("OnlineAuctionWeb.Domain.Models.Auction", b =>
                 {
                     b.Navigation("Bids");
 

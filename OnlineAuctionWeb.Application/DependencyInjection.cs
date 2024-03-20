@@ -12,7 +12,7 @@ namespace OnlineAuctionWeb.Application
         {
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IAuthService, AuthService>();
-            services.AddScoped<IProductService, ProductService>();
+            services.AddScoped<IAuctionService, AuctionService>();
             services.AddScoped<ICategoryService, CategoryService>();
             var key = Encoding.ASCII.GetBytes(configration.GetSection("JwtSettings:Secret").Value!);
             services.AddAuthentication(x =>

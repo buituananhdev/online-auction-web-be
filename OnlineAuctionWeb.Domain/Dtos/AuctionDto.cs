@@ -1,9 +1,15 @@
 ﻿using OnlineAuctionWeb.Domain.Common;
 using OnlineAuctionWeb.Domain.Enums;
+using OnlineAuctionWeb.Domain.Models;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
-namespace OnlineAuctionWeb.Domain.Models
+namespace OnlineAuctionWeb.Domain.Dtos
 {
-    public class Product : BaseDomainEntity
+    public class AuctionDto : BaseDomainEntity
     {
         public string ProductName { get; set; }
         public string Description { get; set; }
@@ -14,10 +20,6 @@ namespace OnlineAuctionWeb.Domain.Models
         public ProductStatusEnum ProductStatus { get; set; }
         public Int32 ViewCount { get; set; }
         public int SellerId { get; set; }
-        public User Seller { get; set; }
         public int CategoryId { get; set; }
-        public Category Category { get; set; }
-        public List<ProductMedia> ProductMedias { get; set; }
-        public List<Bid> Bids { get; set; }
     }
 }

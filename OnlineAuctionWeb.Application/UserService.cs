@@ -43,7 +43,7 @@ namespace OnlineAuctionWeb.Application
                 User user = _mapper.Map<User>(userDto);
                 string hashedPassword = BCrypt.Net.BCrypt.HashPassword(user.Password);
                 user.Password = hashedPassword;
-                user.IsActive = StatusEnum.Active;
+                user.Status = StatusEnum.Active;
                 if(string.IsNullOrEmpty(user.FullName))
                 {
                     user.FullName = "User@" + Guid.NewGuid().ToString().Substring(0, 6);
@@ -66,7 +66,7 @@ namespace OnlineAuctionWeb.Application
                 throw new CustomException(StatusCodes.Status404NotFound, "User not found!");
             }
 
-            user.IsActive = StatusEnum.Inactive;
+            user.Status = StatusEnum.Inactive;
             await _context.SaveChangesAsync();
         }
 

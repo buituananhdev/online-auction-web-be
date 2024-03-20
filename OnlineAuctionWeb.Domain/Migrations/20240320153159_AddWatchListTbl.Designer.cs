@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using OnlineAuctionWeb.Domain;
 
@@ -11,9 +12,11 @@ using OnlineAuctionWeb.Domain;
 namespace OnlineAuctionWeb.Domain.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20240320153159_AddWatchListTbl")]
+    partial class AddWatchListTbl
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -61,7 +64,7 @@ namespace OnlineAuctionWeb.Domain.Migrations
 
                     b.Property<string>("ProductName")
                         .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("ProductStatus")
                         .HasColumnType("int");
@@ -80,8 +83,6 @@ namespace OnlineAuctionWeb.Domain.Migrations
                     b.HasIndex("CategoryId");
 
                     b.HasIndex("SellerId");
-
-                    b.HasIndex("ProductName", "ProductStatus", "DateCreated");
 
                     b.ToTable("Auctions");
                 });
@@ -156,7 +157,7 @@ namespace OnlineAuctionWeb.Domain.Migrations
 
                     b.Property<string>("CategoryName")
                         .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("DateCreated")
                         .HasColumnType("datetime2");
@@ -172,9 +173,6 @@ namespace OnlineAuctionWeb.Domain.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("CategoryName")
-                        .IsUnique();
 
                     b.ToTable("Categories");
                 });
@@ -212,10 +210,9 @@ namespace OnlineAuctionWeb.Domain.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ToUserId");
+                    b.HasIndex("FromUserId");
 
-                    b.HasIndex("FromUserId", "ToUserId")
-                        .IsUnique();
+                    b.HasIndex("ToUserId");
 
                     b.ToTable("Feedbacks");
                 });
@@ -308,11 +305,14 @@ namespace OnlineAuctionWeb.Domain.Migrations
 
                     b.Property<string>("Email")
                         .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("FullName")
                         .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("IsActive")
+                        .HasColumnType("int");
 
                     b.Property<string>("LastModifiedBy")
                         .IsRequired()
@@ -332,13 +332,7 @@ namespace OnlineAuctionWeb.Domain.Migrations
                     b.Property<int>("Role")
                         .HasColumnType("int");
 
-                    b.Property<int>("Status")
-                        .HasColumnType("int");
-
                     b.HasKey("Id");
-
-                    b.HasIndex("Email", "FullName", "Status", "DateCreated")
-                        .IsUnique();
 
                     b.ToTable("Users");
                 });

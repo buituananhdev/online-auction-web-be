@@ -4,9 +4,9 @@ using OnlineAuctionWeb.Domain.Enums;
 
 namespace OnlineAuctionWeb.Domain.Dtos
 {
-    public class CreateProductDto
+    public class CreateAuctionDto
     {
-        [Required(ErrorMessage = "Product Name is required")]
+        [Required(ErrorMessage = "Auction Name is required")]
         public string ProductName { get; set; }
 
         public string Description { get; set; } = string.Empty;

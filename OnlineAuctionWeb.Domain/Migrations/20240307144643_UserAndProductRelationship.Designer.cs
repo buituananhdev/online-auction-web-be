@@ -25,7 +25,7 @@ namespace OnlineAuctionWeb.Domain.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("OnlineAuctionWeb.Domain.Models.Product", b =>
+            modelBuilder.Entity("OnlineAuctionWeb.Domain.Models.Auction", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -125,7 +125,7 @@ namespace OnlineAuctionWeb.Domain.Migrations
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("OnlineAuctionWeb.Domain.Models.Product", b =>
+            modelBuilder.Entity("OnlineAuctionWeb.Domain.Models.Auction", b =>
                 {
                     b.HasOne("OnlineAuctionWeb.Domain.Models.User", "Seller")
                         .WithMany("Products")

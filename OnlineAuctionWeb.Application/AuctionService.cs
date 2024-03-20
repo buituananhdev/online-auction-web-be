@@ -9,30 +9,30 @@ using OnlineAuctionWeb.Infrastructure.Exceptions;
 
 namespace OnlineAuctionWeb.Application
 {
-    public interface IProductService
+    public interface IAuctionService
     {
-        Task<PaginatedResult<ProductDto>> GetAllAsync(int pageNumber, int pageSize);
-        Task<ProductDto> GetByIdAsync(int id);
-        Task CreateAsync(CreateProductDto productDto);
-        Task<ProductDto> UpdateAsync(int id, ProductDto productDto);
-        Task<ProductDto> DeleteAsync(int id);
+        Task<PaginatedResult<AuctionDto>> GetAllAsync(int pageNumber, int pageSize);
+        Task<AuctionDto> GetByIdAsync(int id);
+        Task CreateAsync(CreateAuctionDto productDto);
+        Task<AuctionDto> UpdateAsync(int id, AuctionDto productDto);
+        Task<AuctionDto> DeleteAsync(int id);
     }
-    public class ProductService : IProductService
+    public class AuctionService : IAuctionService
     {
         private readonly DataContext _context;
         private readonly IMapper _mapper;
-        public ProductService(DataContext context, IMapper mapper)
+        public AuctionService(DataContext context, IMapper mapper)
         {
             _context = context;
             _mapper = mapper;
         }
 
-        public async Task CreateAsync(CreateProductDto productDto)
+        public async Task CreateAsync(CreateAuctionDto productDto)
         {
             try
             {
-                var product = _mapper.Map<Product>(productDto);
-                _context.Products.Add(product);
+                var auction = _mapper.Map<Auction>(productDto);
+                _context.Auctions.Add(auction);
                 await _context.SaveChangesAsync();
             }
             catch (Exception ex)
@@ -42,38 +42,38 @@ namespace OnlineAuctionWeb.Application
             }
         }
 
-        public Task<ProductDto> DeleteAsync(int id)
+        public Task<AuctionDto> DeleteAsync(int id)
         {
             throw new NotImplementedException();
         }
 
-        public Task<ProductDto> FindProductByNameAsync(string name)
+        public Task<AuctionDto> FindProductByNameAsync(string name)
         {
             throw new NotImplementedException();
         }
 
-        public async Task<PaginatedResult<ProductDto>> GetAllAsync(int pageNumber, int pageSize)
+        public async Task<PaginatedResult<AuctionDto>> GetAllAsync(int pageNumber, int pageSize)
         {
             try
             {
-                var totalProducts = await _context.Products.CountAsync();
+                var totalAuctions = await _context.Auctions.CountAsync();
 
-                var products = await _context.Products
+                var auctions = await _context.Auctions
                     .Skip((pageNumber - 1) * pageSize)
                     .Take(pageSize)
                     .ToListAsync();
 
-                var totalPages = (int)Math.Ceiling((double)totalProducts / pageSize);
+                var totalPages = (int)Math.Ceiling((double)totalAuctions / pageSize);
                 var meta = new PaginatedMeta
                 {
                     CurrentPage = pageNumber,
                     TotalPages = totalPages,
                     PageSize = pageSize,
                 };
-                var result = new PaginatedResult<ProductDto>
+                var result = new PaginatedResult<AuctionDto>
                 {
                     Meta = meta,
-                    Data = _mapper.Map<List<ProductDto>>(products)
+                    Data = _mapper.Map<List<AuctionDto>>(auctions)
                 };
 
                 return result;
@@ -85,17 +85,17 @@ namespace OnlineAuctionWeb.Application
             }
         }
 
-        public async Task<ProductDto> GetByIdAsync(int id)
+        public async Task<AuctionDto> GetByIdAsync(int id)
         {
-            var product = await _context.Products.FindAsync(id);
-            if (product == null)
+            var auction = await _context.Auctions.FindAsync(id);
+            if (auction == null)
             {
-                throw new CustomException(StatusCodes.Status404NotFound, "Product not found!");
+                throw new CustomException(StatusCodes.Status404NotFound, "Auction not found!");
             }
-            return _mapper.Map<ProductDto>(product);
+            return _mapper.Map<AuctionDto>(auction);
         }
 
-        public Task<ProductDto> UpdateAsync(int id, ProductDto productDto)
+        public Task<AuctionDto> UpdateAsync(int id, AuctionDto productDto)
         {
             throw new NotImplementedException();
         }
