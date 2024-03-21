@@ -52,7 +52,7 @@ namespace OnlineAuctionWeb.Application
             {
                 var totalCaregories = await _context.Categories.CountAsync();
 
-                var categories = await _context.Users
+                var categories = await _context.Categories
                     .Skip((pageNumber - 1) * pageSize)
                     .Take(pageSize)
                     .ToListAsync();
