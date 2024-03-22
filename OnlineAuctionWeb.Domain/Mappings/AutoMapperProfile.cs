@@ -18,6 +18,8 @@ namespace OnlineAuctionWeb.Domain.Mappings
 
             CreateMap<Category, CreateCategoryDto>().ReverseMap();
             CreateMap<Category, CategoryDto>().ReverseMap();
+
+            CreateMap<Bid, BidDto>().ReverseMap();
         }
     }
 }
