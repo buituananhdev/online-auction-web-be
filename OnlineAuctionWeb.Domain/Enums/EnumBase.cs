@@ -29,10 +29,10 @@
         PendingPublish = 5
     }
 
-    public enum VnpayErrorCode
+    public enum VnpayResponseCode
     {
         // VNPAY phản hồi qua IPN và Return URL
-        Success = 0,
+        Success = 00,
         SuspiciousTransaction = 7,
         UnsuccessfulTransactionDueToCustomerNotRegistered = 9,
         UnsuccessfulTransactionDueToInvalidAuthentication = 10,

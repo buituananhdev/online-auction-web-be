@@ -14,6 +14,7 @@ namespace OnlineAuctionWeb.Application
             services.AddScoped<IAuthService, AuthService>();
             services.AddScoped<IAuctionService, AuctionService>();
             services.AddScoped<ICategoryService, CategoryService>();
+            services.AddScoped<IBidService, BidService>();
             var key = Encoding.ASCII.GetBytes(configration.GetSection("JwtSettings:Secret").Value!);
             services.AddAuthentication(x =>
             {
