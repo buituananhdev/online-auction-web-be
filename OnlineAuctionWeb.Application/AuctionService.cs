@@ -7,7 +7,6 @@ using OnlineAuctionWeb.Domain.Enums;
 using OnlineAuctionWeb.Domain.Models;
 using OnlineAuctionWeb.Domain.Payloads;
 using OnlineAuctionWeb.Infrastructure.Exceptions;
-using OnlineAuctionWeb.Infrastructure.Utils;
 
 namespace OnlineAuctionWeb.Application
 {
@@ -28,6 +27,7 @@ namespace OnlineAuctionWeb.Application
         Task CreateAsync(CreateAuctionDto productDto, int userId);
         Task<AuctionDto> UpdateAsync(int id, AuctionDto productDto);
         Task<AuctionDto> DeleteAsync(int id);
+        Task SeedData(int count);
     }
     public class AuctionService : IAuctionService
     {
@@ -70,7 +70,8 @@ namespace OnlineAuctionWeb.Application
                 auction.ProductStatus = ProductStatusEnum.Canceled;
                 await _context.SaveChangesAsync();
                 return _mapper.Map<AuctionDto>(auction);
-            } catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 Console.WriteLine("Err", ex.Message);
                 throw;
@@ -194,6 +195,34 @@ namespace OnlineAuctionWeb.Application
                 throw new CustomException(StatusCodes.Status404NotFound, "Auction not found!");
             }
             return _mapper.Map<AuctionDto>(auction);
+        }
+
+        public async Task SeedData(int count)
+        {
+            var random = new Random();
+
+            for (int i = 0; i < count; i++)
+            {
+                var product = new Auction
+                {
+                    ProductName = $"Iphone {i + 1} promax vip {random.Next(0, 512)}GB",
+                    Description = $"Description for Product {i + 1}",
+                    Condition = (ConditionEnum)random.Next(0, 3), // Assume ConditionEnum has 3 values
+                    StartingPrice = random.Next(10, 1000),
+                    MaxPrice = random.Next(1000, 5000),
+                    CurrentPrice = random.Next(10, 1000),
+                    EndTime = DateTime.Now.AddDays(random.Next(1, 30)),
+                    CanReturn = random.Next(0, 2) == 1,
+                    ProductStatus = (ProductStatusEnum)random.Next(0, 3), // Assume ProductStatusEnum has 3 values
+                    ViewCount = random.Next(0, 1000),
+                    SellerId = 17, // SellerId is 22 as specified
+                    CategoryId = random.Next(3, 4) // Assuming you have 10 categories
+                };
+
+                await _context.AddAsync(product);
+            }
+
+            await _context.SaveChangesAsync();
         }
 
         public Task<AuctionDto> UpdateAsync(int id, AuctionDto productDto)

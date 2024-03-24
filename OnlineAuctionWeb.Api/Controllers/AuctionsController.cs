@@ -95,5 +95,12 @@ namespace OnlineAuctionWeb.Api.Controllers
             var result = await _AuctionService.DeleteAsync(id);
             return Ok(result);
         }
+
+        [HttpPost("seed")]
+        public async Task<IActionResult> SeedAuctions(int count)
+        {
+            await _AuctionService.SeedData(count);
+            return StatusCode(201);
+        }
     }
 }
