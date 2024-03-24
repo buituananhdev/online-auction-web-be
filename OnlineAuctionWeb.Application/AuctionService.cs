@@ -33,12 +33,12 @@ namespace OnlineAuctionWeb.Application
     {
         private readonly DataContext _context;
         private readonly IMapper _mapper;
-        private readonly IUserService _userService;
-        public AuctionService(DataContext context, IMapper mapper, IUserService userService)
+        private readonly IFeedbackService _feedbackService;
+        public AuctionService(DataContext context, IMapper mapper, IFeedbackService feedbackService)
         {
             _context = context;
             _mapper = mapper;
-            _userService = userService;
+            _feedbackService = feedbackService;
         }
 
         public async Task CreateAsync(CreateAuctionDto auctionDto, int userId)
@@ -117,7 +117,7 @@ namespace OnlineAuctionWeb.Application
                     query = query.Where(a => a.Condition == condition);
                 }
 
-                // Filter by starting price range
+                // Filter by current price range
                 if (minCurrentPrice != null)
                 {
                     query = query.Where(a => a.CurrentPrice >= minCurrentPrice);
@@ -157,15 +157,16 @@ namespace OnlineAuctionWeb.Application
                 var totalPages = (int)Math.Ceiling((double)totalAuctions / pageSize);
 
                 // Map auctions to AuctionDtos
-                var auctionDtos = auctions.Select(auction =>
+                var auctionDtos = new List<AuctionDto>();
+                foreach (var auction in auctions)
                 {
                     var auctionDto = _mapper.Map<AuctionDto>(auction);
                     auctionDto.BidCount = auction.Bids.Count();
                     auctionDto.Seller = _mapper.Map<UserDto>(auction.Seller);
+                    auctionDto.Seller.ratings = await _feedbackService.GetAverageRatingByUserIdAsync(auction.SellerId);
                     auctionDto.CategoryName = auction.Category.CategoryName;
-
-                    return auctionDto;
-                }).ToList();
+                    auctionDtos.Add(auctionDto);
+                }
 
                 var meta = new PaginatedMeta
                 {

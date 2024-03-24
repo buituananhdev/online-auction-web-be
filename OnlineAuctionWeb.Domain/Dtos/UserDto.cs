@@ -1,5 +1,6 @@
 ﻿using OnlineAuctionWeb.Domain.Common;
 using OnlineAuctionWeb.Domain.Enums;
+using OnlineAuctionWeb.Domain.Payloads;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,5 +18,6 @@ namespace OnlineAuctionWeb.Domain.Dtos
         public string Password { get; set; }
         public int Role { get; set; }
         public StatusEnum Status { get; set; }
+        public AvarageRatingPayload ratings { get; set; }
     }
 }

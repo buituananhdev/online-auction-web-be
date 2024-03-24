@@ -26,10 +26,12 @@ namespace OnlineAuctionWeb.Application
     {
         private readonly DataContext _context;
         private readonly IMapper _mapper;
-        public UserService(DataContext contex, IMapper mapper)
+        private readonly IFeedbackService _feedbackService;
+        public UserService(DataContext contex, IMapper mapper, IFeedbackService feedbackService)
         {
             _context = contex;
             _mapper = mapper;
+            _feedbackService = feedbackService;
         }
         public async Task CreateAsync(CreateUserDto userDto)
         {
@@ -81,6 +83,13 @@ namespace OnlineAuctionWeb.Application
                     .Take(pageSize)
                     .ToListAsync();
 
+                var userDtos = _mapper.Map<List<UserDto>>(users);
+
+                userDtos.ForEach(async user =>
+                {
+                    user.ratings = await _feedbackService.GetAverageRatingByUserIdAsync(user.Id);
+                });
+
                 var totalPages = (int)Math.Ceiling((double)totalUsers / pageSize);
                 var meta = new PaginatedMeta
                 {
@@ -91,7 +100,7 @@ namespace OnlineAuctionWeb.Application
                 var result = new PaginatedResult<UserDto>
                 {
                     Meta = meta,
-                    Data = _mapper.Map<List<UserDto>>(users)
+                    Data = userDtos
                 };
 
                 return result;
@@ -112,7 +121,9 @@ namespace OnlineAuctionWeb.Application
                 {
                     throw new CustomException(StatusCodes.Status404NotFound, "User not found!");
                 }
-                return _mapper.Map<UserDto>(user);
+                var userDto = _mapper.Map<UserDto>(user);
+                userDto.ratings = await _feedbackService.GetAverageRatingByUserIdAsync(id);
+                return userDto;
             }
             catch (Exception ex)
             {
