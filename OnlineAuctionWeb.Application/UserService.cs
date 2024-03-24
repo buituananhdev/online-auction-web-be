@@ -87,7 +87,7 @@ namespace OnlineAuctionWeb.Application
 
                 userDtos.ForEach(async user =>
                 {
-                    user.ratings = await _feedbackService.GetAverageRatingByUserIdAsync(user.Id);
+                    user.ratings = _feedbackService.GetAverageRatingByUserId(user.Id);
                 });
 
                 var totalPages = (int)Math.Ceiling((double)totalUsers / pageSize);
@@ -122,7 +122,7 @@ namespace OnlineAuctionWeb.Application
                     throw new CustomException(StatusCodes.Status404NotFound, "User not found!");
                 }
                 var userDto = _mapper.Map<UserDto>(user);
-                userDto.ratings = await _feedbackService.GetAverageRatingByUserIdAsync(id);
+                userDto.ratings = _feedbackService.GetAverageRatingByUserId(id);
                 return userDto;
             }
             catch (Exception ex)
