@@ -56,24 +56,42 @@ namespace OnlineAuctionWeb.Application
         {
             try
             {
-                var totalAuctions = await _context.Auctions.CountAsync();
+                var query = _context.Auctions
+                    .Include(a => a.Bids)
+                    .Select(a => new
+                    {
+                        Auction = a,
+                        BidCount = a.Bids.Count()
+                    });
 
-                var auctions = await _context.Auctions
+                var totalAuctions = await query.CountAsync();
+
+                var auctions = await query
                     .Skip((pageNumber - 1) * pageSize)
                     .Take(pageSize)
                     .ToListAsync();
 
                 var totalPages = (int)Math.Ceiling((double)totalAuctions / pageSize);
+
+                // Map auctions to AuctionDtos
+                var auctionDtos = auctions.Select(auction =>
+                {
+                    var auctionDto = _mapper.Map<AuctionDto>(auction.Auction);
+                    auctionDto.BidCount = auction.BidCount;
+                    return auctionDto;
+                }).ToList();
+
                 var meta = new PaginatedMeta
                 {
                     CurrentPage = pageNumber,
                     TotalPages = totalPages,
                     PageSize = pageSize,
                 };
+
                 var result = new PaginatedResult<AuctionDto>
                 {
                     Meta = meta,
-                    Data = _mapper.Map<List<AuctionDto>>(auctions)
+                    Data = auctionDtos
                 };
 
                 return result;

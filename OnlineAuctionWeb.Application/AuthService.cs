@@ -35,7 +35,7 @@ namespace OnlineAuctionWeb.Application
                 {
                     throw new CustomException(StatusCodes.Status404NotFound, "User not found!");
                 }
-                if (user.IsActive == StatusEnum.Inactive)
+                if (user.Status == StatusEnum.Inactive)
                 {
                     throw new CustomException(StatusCodes.Status403Forbidden, "User is inactive!");
                 }

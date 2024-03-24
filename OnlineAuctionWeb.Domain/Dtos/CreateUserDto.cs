@@ -19,10 +19,12 @@ namespace OnlineAuctionWeb.Domain.Dtos
         [StringLength(50, MinimumLength = 6, ErrorMessage = "Password must be between 6 and 50 characters")]
         public string Password { get; set; }
 
+        [Required(ErrorMessage = "Role is required")]
         [EnumDataType(typeof(RoleEnum), ErrorMessage = "Invalid role")]
         public RoleEnum Role { get; set; }
 
         [Required(ErrorMessage = "Status is required")]
-        public StatusEnum IsActive { get; set; }
+        [EnumDataType(typeof(StatusEnum), ErrorMessage = "Invalid status")]
+        public StatusEnum Status { get; set; }
     }
 }

@@ -17,6 +17,7 @@ namespace OnlineAuctionWeb.Domain.Dtos
         public decimal StartingPrice { get; set; }
         public DateTime EndTime { get; set; }
         public Boolean CanReturn { get; set; }
+        public int BidCount { get; set; }
         public ProductStatusEnum ProductStatus { get; set; }
         public Int32 ViewCount { get; set; }
         public int SellerId { get; set; }
