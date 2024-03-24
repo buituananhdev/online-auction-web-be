@@ -31,7 +31,7 @@ namespace OnlineAuctionWeb.Api.Controllers
         /// <param name="pageSize">The number of users per page (default is 10).</param>
         /// <returns>Returns a paginated list of users.</returns>
         [HttpGet]
-        [RolesAuthorize(RequiredRoles = new int[] { (int)RoleEnum.Admin })]
+        //[RolesAuthorize(RequiredRoles = new int[] { (int)RoleEnum.Admin })]
         public async Task<IActionResult> GetUsers([FromQuery] int page = 1, [FromQuery] int pageSize = 10)
         {
             var users = await _userService.GetAllAsync(page, pageSize);

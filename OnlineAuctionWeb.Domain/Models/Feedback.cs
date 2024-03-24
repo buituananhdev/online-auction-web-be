@@ -1,5 +1,4 @@
 ﻿using OnlineAuctionWeb.Domain.Common;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace OnlineAuctionWeb.Domain.Models
 {
