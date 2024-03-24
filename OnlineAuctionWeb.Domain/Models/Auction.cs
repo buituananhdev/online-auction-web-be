@@ -10,6 +10,7 @@ namespace OnlineAuctionWeb.Domain.Models
         public ConditionEnum Condition { get; set; }
         public decimal StartingPrice { get; set; }
         public decimal MaxPrice { get; set; }
+        public decimal CurrentPrice { get; set; }
         public DateTime EndTime { get; set; }
         public Boolean CanReturn { get; set; }
         public ProductStatusEnum ProductStatus { get; set; }

@@ -18,6 +18,10 @@ namespace OnlineAuctionWeb.Domain.Dtos
         [Range(0, double.MaxValue, ErrorMessage = "Starting Price must be greater than or equal to 0")]
         public decimal StartingPrice { get; set; }
 
+        [Required(ErrorMessage = "Max Price is required")]
+        [Range(0, double.MaxValue, ErrorMessage = "Starting Price must be greater than or equal to 0")]
+        public decimal MaxPrice { get; set; }
+
         [Required(ErrorMessage = "End Time is required")]
         [FutureDate(ErrorMessage = "End Time must be a future date")]
         public DateTime EndTime { get; set; }
@@ -25,10 +29,6 @@ namespace OnlineAuctionWeb.Domain.Dtos
         public bool CanReturn { get; set; } = false;
 
         public ProductStatusEnum ProductStatus { get; set; } = ProductStatusEnum.Available;
-
-        [Required(ErrorMessage = "Seller ID is required")]
-        [Range(1, int.MaxValue, ErrorMessage = "Seller ID must be greater than 0")]
-        public int SellerId { get; set; }
 
         [Required(ErrorMessage = "Category ID is required")]
         [Range(1, int.MaxValue, ErrorMessage = "Category ID must be greater than 0")]
