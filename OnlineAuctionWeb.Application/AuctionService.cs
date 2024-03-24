@@ -163,7 +163,7 @@ namespace OnlineAuctionWeb.Application
                     var auctionDto = _mapper.Map<AuctionDto>(auction);
                     auctionDto.BidCount = auction.Bids.Count();
                     auctionDto.Seller = _mapper.Map<UserDto>(auction.Seller);
-                    auctionDto.Seller.ratings = await _feedbackService.GetAverageRatingByUserIdAsync(auction.SellerId);
+                    auctionDto.Seller.ratings = _feedbackService.GetAverageRatingByUserId(auction.SellerId);
                     auctionDto.CategoryName = auction.Category.CategoryName;
                     auctionDtos.Add(auctionDto);
                 }

@@ -11,28 +11,29 @@ namespace OnlineAuctionWeb.Application
 {
     public interface IFeedbackService
     {
-        Task<AvarageRatingPayload> GetAverageRatingByUserIdAsync(int userId);
+        AvarageRatingPayload GetAverageRatingByUserId(int userId);
     }
 
     public class FeedbackService : IFeedbackService
     {
-        private readonly DataContext _context;
+        private readonly DataContext context;
         public FeedbackService(DataContext context)
         {
-            _context = context;
+            this.context = context;
         }
-        public async Task<AvarageRatingPayload> GetAverageRatingByUserIdAsync(int userId)
+        public AvarageRatingPayload GetAverageRatingByUserId(int userId)
         {
-            var averageRating = await _context.Feedbacks
+            var averageRating = context.Feedbacks
                 .Where(f => f.ToUserId == userId)
                 .Select(f => f.Rating)
                 .DefaultIfEmpty()
-                .AverageAsync();
+                .Average();
             var payload = new AvarageRatingPayload
             {
                 AvarageRating = averageRating,
-                TotalRatings = await _context.Feedbacks.CountAsync(f => f.ToUserId == userId)
+                TotalRatings = context.Feedbacks.Count(f => f.ToUserId == userId)
             };
+            
             return payload;
         }
     }
