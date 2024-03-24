@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using OnlineAuctionWeb.Application;
 using OnlineAuctionWeb.Domain.Dtos;
+using OnlineAuctionWeb.Domain.Enums;
 
 namespace OnlineAuctionWeb.Api.Controllers
 {
@@ -15,15 +16,33 @@ namespace OnlineAuctionWeb.Api.Controllers
         }
 
         /// <summary>
-        /// Retrieves all auctions with pagination support.
+        /// Retrieves a paginated list of auctions with optional filtering and search capabilities.
         /// </summary>
         /// <param name="pageNumber">The page number for pagination.</param>
         /// <param name="pageSize">The size of each page.</param>
-        /// <returns>Returns a paginated list of auctions.</returns>
+        /// <param name="searchQuery">Optional. A search query to filter auctions by name or description.</param>
+        /// <param name="condition">Optional. Filters auctions by their condition. 1: New, 2: Open box, 3: Used</param>
+        /// <param name="minCurrentPrice">Optional. Filters auctions by the minimum current price.</param>
+        /// <param name="maxCurrentPrice">Optional. Filters auctions by the maximum current price.</param>
+        /// <param name="minMaxPrice">Optional. Filters auctions by the minimum maximum price (reserve price).</param>
+        /// <param name="maxMaxPrice">Optional. Filters auctions by the maximum maximum price (reserve price).</param>
+        /// <param name="minEndTime">Optional. Filters auctions by the minimum end time.</param>
+        /// <param name="maxEndTime">Optional. Filters auctions by the maximum end time.</param>
+        /// <returns>Returns a paginated list of auctions based on the provided filters and pagination parameters.</returns>
         [HttpGet]
-        public async Task<IActionResult> GetAllAsync(int pageNumber = 1, int pageSize = 10)
+        public async Task<IActionResult> GetAllAsync(
+            int pageNumber = 1,
+            int pageSize = 10,
+            string searchQuery = null,
+            ConditionEnum? condition = null,
+            decimal? minCurrentPrice = null,
+            decimal? maxCurrentPrice = null,
+            decimal? minMaxPrice = null,
+            decimal? maxMaxPrice = null,
+            DateTime? minEndTime = null,
+            DateTime? maxEndTime = null)
         {
-            var result = await _AuctionService.GetAllAsync(pageNumber, pageSize);
+            var result = await _AuctionService.GetAllAsync(pageNumber, pageSize, searchQuery, condition, minCurrentPrice, maxCurrentPrice, minMaxPrice, maxMaxPrice, minEndTime, maxEndTime);
             return Ok(result);
         }
 
@@ -47,7 +66,8 @@ namespace OnlineAuctionWeb.Api.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateAsync(CreateAuctionDto AuctionDto)
         {
-            await _AuctionService.CreateAsync(AuctionDto);
+            var userId = User.Claims.FirstOrDefault(c => c.Type == "ID")?.Value;
+            await _AuctionService.CreateAsync(AuctionDto, int.Parse(userId));
             return StatusCode(201);
         }
 
