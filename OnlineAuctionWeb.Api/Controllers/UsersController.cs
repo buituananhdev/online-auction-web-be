@@ -25,16 +25,22 @@ namespace OnlineAuctionWeb.Api.Controllers
         }
 
         /// <summary>
-        /// Gets a paginated list of users.
+        /// Gets a paginated list of users based on optional search and filter criteria.
         /// </summary>
         /// <param name="page">The page number (default is 1).</param>
         /// <param name="pageSize">The number of users per page (default is 10).</param>
+        /// <param name="searchQuery">Optional search query to filter users by name or email.</param>
+        /// <param name="status">Optional status filter to filter users by their status.</param>
         /// <returns>Returns a paginated list of users.</returns>
         [HttpGet]
         //[RolesAuthorize(RequiredRoles = new int[] { (int)RoleEnum.Admin })]
-        public async Task<IActionResult> GetUsers([FromQuery] int page = 1, [FromQuery] int pageSize = 10)
+        public async Task<IActionResult> GetUsers(
+            [FromQuery] int page = 1, 
+            [FromQuery] int pageSize = 10, 
+            [FromQuery] string searchQuery = null, 
+            [FromQuery] StatusEnum status = 0)
         {
-            var users = await _userService.GetAllAsync(page, pageSize);
+            var users = await _userService.GetAllAsync(page, pageSize, searchQuery, status);
             return Ok(users);
         }
 

@@ -12,7 +12,11 @@ namespace OnlineAuctionWeb.Application
 {
     public interface IUserService
     {
-        Task<PaginatedResult<UserDto>> GetAllAsync(int pageNumber, int pageSize);
+        Task<PaginatedResult<UserDto>> GetAllAsync(
+            int pageNumber, 
+            int pageSize, 
+            string searchQuery = null,
+            StatusEnum status = 0);
         Task<UserDto> GetByIdAsync(int id);
         Task CreateAsync(CreateUserDto userDto);
         Task<UserDto> UpdateAsync(int id, UserDto userDto);
@@ -72,13 +76,32 @@ namespace OnlineAuctionWeb.Application
             await _context.SaveChangesAsync();
         }
 
-        public async Task<PaginatedResult<UserDto>> GetAllAsync(int pageNumber, int pageSize)
+        public async Task<PaginatedResult<UserDto>> GetAllAsync(
+            int pageNumber, 
+            int pageSize, 
+            string searchQuery = null,
+            StatusEnum status = 0)
         {
             try
             {
-                var totalUsers = await _context.Users.CountAsync();
+                var query = _context.Users.AsQueryable();
 
-                var users = await _context.Users
+                if (status != 0)
+                {
+                    query = query.Where(u => u.Status == status);
+                }
+
+                // Search query filter
+                if (!string.IsNullOrEmpty(searchQuery))
+                {
+                    query = query.Where(a =>
+                        EF.Functions.Like(a.FullName, $"%{searchQuery}%") ||
+                        EF.Functions.Like(a.Email, $"%{searchQuery}%"));
+                }
+
+                var totalUsers = await query.CountAsync();
+
+                var users = await query
                     .Skip((pageNumber - 1) * pageSize)
                     .Take(pageSize)
                     .ToListAsync();
