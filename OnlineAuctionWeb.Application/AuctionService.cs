@@ -100,6 +100,7 @@ namespace OnlineAuctionWeb.Application
                 var query = _context.Auctions
                     .Include(a => a.Bids) // Include bids related to auction
                     .Include(a => a.Seller) // Include seller information
+                    .Include(a => a.Category) // Include category information
                     .AsQueryable();
 
                 // Filter by search query (fuzzy search)
@@ -161,6 +162,7 @@ namespace OnlineAuctionWeb.Application
                     var auctionDto = _mapper.Map<AuctionDto>(auction);
                     auctionDto.BidCount = auction.Bids.Count();
                     auctionDto.Seller = _mapper.Map<UserDto>(auction.Seller);
+                    auctionDto.CategoryName = auction.Category.CategoryName;
 
                     return auctionDto;
                 }).ToList();
