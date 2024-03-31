@@ -7,6 +7,7 @@ using OnlineAuctionWeb.Application;
 using OnlineAuctionWeb.Domain.Dtos;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using OnlineAuctionWeb.Domain.Enums;
 
 namespace OnlineAuctionWeb.Api.Controllers
 {
@@ -52,6 +53,20 @@ namespace OnlineAuctionWeb.Api.Controllers
         {
             await _authService.Register(payload);
             return StatusCode(201);
+        }
+
+        /// <summary>
+        /// Authenticates user with Google.
+        /// </summary>
+        /// <param name="googleToken">The Google authentication token.</param>
+        /// <param name="role">The role of the user.</param>
+        /// <returns>Returns authentication result.</returns>
+        [HttpPost]
+        [Route("google")]
+        public async Task<IActionResult> AuthWithGoogle([FromQuery] string googleToken, [FromQuery] RoleEnum role)
+        {
+            var result = await _authService.AuthWithGoogle(googleToken, role);
+            return Ok(result);
         }
     }
 }

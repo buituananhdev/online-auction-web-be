@@ -7,11 +7,11 @@ namespace OnlineAuctionWeb.Domain.Models
     {
         public int BidId { get; set; }
         public Bid Bid { get; set; }
-        public string MerchantId { get; set; }
+        public string? MerchantId { get; set; }
         public VnpayResponseCode ResponseCode { get; set; }
-        public string TransactionNumber { get; set; }
-        public string Bank { get; set; }
-        public decimal Amount { get; set; }
+        public string? TransactionNumber { get; set; }
+        public string? Bank { get; set; }
+        public decimal? Amount { get; set; }
         public DateTime PaymentDate { get; set; }
     }
 }

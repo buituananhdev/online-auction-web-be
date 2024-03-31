@@ -19,9 +19,10 @@ namespace OnlineAuctionWeb.Application
             StatusEnum status = 0);
         Task<UserDto> GetByIdAsync(int id);
         Task CreateAsync(CreateUserDto userDto);
+        Task<UserDto> CreateGoogleUserAsync(CreateUserDto userDto);
         Task<UserDto> UpdateAsync(int id, UserDto userDto);
         Task DeleteAsync(int id);
-        Task<UserDto> FindUserByEmailAsync(string email);
+        UserDto FindUserByEmailAsync(string email);
         Task<bool> UserExistsByEmailAsync(string email);
         Task<int> GetUserRoleByIdAsync(int id);
     }
@@ -155,11 +156,11 @@ namespace OnlineAuctionWeb.Application
             }
         }
 
-        public async Task<UserDto> FindUserByEmailAsync(string email)
+        public UserDto FindUserByEmailAsync(string email)
         {
             try
             {
-                var user = await _context.Users.FirstOrDefaultAsync(x => x.Email == email);
+                var user = _context.Users.FirstOrDefault(x => x.Email == email);
                 return _mapper.Map<UserDto>(user);
             }
             catch (Exception ex)
@@ -187,6 +188,22 @@ namespace OnlineAuctionWeb.Application
             .FirstOrDefaultAsync();
 
             return role;
+        }
+
+        public async Task<UserDto> CreateGoogleUserAsync(CreateUserDto userDto)
+        {
+            try
+            {
+                User user = _mapper.Map<User>(userDto);
+                _context.Users.Add(user);
+                await _context.SaveChangesAsync();
+                return _mapper.Map<UserDto>(_context.Users.FirstOrDefault(x => x.Email == user.Email));
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Err", ex.Message);
+                throw;
+            }
         }
     }
 }

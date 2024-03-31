@@ -16,7 +16,8 @@ namespace OnlineAuctionWeb.Domain.Dtos
         public string Phone { get; set; } = string.Empty;
         public string Address { get; set; } = string.Empty;
         public string Password { get; set; }
-        public int Role { get; set; }
+        public string Avatar { get; set; }
+        public RoleEnum Role { get; set; }
         public StatusEnum Status { get; set; }
         public AvarageRatingPayload ratings { get; set; }
     }
