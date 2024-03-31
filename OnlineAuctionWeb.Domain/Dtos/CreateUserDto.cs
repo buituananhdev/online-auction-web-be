@@ -5,6 +5,8 @@ namespace OnlineAuctionWeb.Domain.Dtos
 {
     public class CreateUserDto
     {
+        public string FullName { get; set; }
+
         [Required(ErrorMessage = "Email is required")]
         [EmailAddress(ErrorMessage = "Invalid email format")]
         public string Email { get; set; }
@@ -18,6 +20,8 @@ namespace OnlineAuctionWeb.Domain.Dtos
         [Required(ErrorMessage = "Password is required")]
         [StringLength(50, MinimumLength = 6, ErrorMessage = "Password must be between 6 and 50 characters")]
         public string Password { get; set; }
+
+        public string Avatar { get; set; }
 
         [Required(ErrorMessage = "Role is required")]
         [EnumDataType(typeof(RoleEnum), ErrorMessage = "Invalid role")]
