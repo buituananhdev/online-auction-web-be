@@ -22,7 +22,8 @@ namespace OnlineAuctionWeb.Application
             decimal? minMaxPrice = null,
             decimal? maxMaxPrice = null,
             DateTime? minEndTime = null,
-            DateTime? maxEndTime = null);
+            DateTime? maxEndTime = null,
+            int? categoryId = null);
         Task<AuctionDto> GetByIdAsync(int id);
         Task CreateAsync(CreateAuctionDto productDto, int userId);
         Task<AuctionDto> UpdateAsync(int id, AuctionDto productDto);
@@ -93,7 +94,8 @@ namespace OnlineAuctionWeb.Application
             decimal? minMaxPrice = null,
             decimal? maxMaxPrice = null,
             DateTime? minEndTime = null,
-            DateTime? maxEndTime = null)
+            DateTime? maxEndTime = null,
+            int? categoryId = null)
         {
             try
             {
@@ -145,6 +147,12 @@ namespace OnlineAuctionWeb.Application
                 if (maxEndTime != null)
                 {
                     query = query.Where(a => a.EndTime <= maxEndTime);
+                }
+
+                // Filter by category
+                if (categoryId != null)
+                {
+                    query = query.Where(a => a.CategoryId == categoryId);
                 }
 
                 var totalAuctions = await query.CountAsync();

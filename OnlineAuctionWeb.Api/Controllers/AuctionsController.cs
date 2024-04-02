@@ -28,6 +28,7 @@ namespace OnlineAuctionWeb.Api.Controllers
         /// <param name="maxMaxPrice">Optional. Filters auctions by the maximum maximum price (reserve price).</param>
         /// <param name="minEndTime">Optional. Filters auctions by the minimum end time.</param>
         /// <param name="maxEndTime">Optional. Filters auctions by the maximum end time.</param>
+        /// <param name="categoryId">Optional. Filters auctions by category.</param>
         /// <returns>Returns a paginated list of auctions based on the provided filters and pagination parameters.</returns>
         [HttpGet]
         public async Task<IActionResult> GetAllAsync(
@@ -40,9 +41,10 @@ namespace OnlineAuctionWeb.Api.Controllers
             decimal? minMaxPrice = null,
             decimal? maxMaxPrice = null,
             DateTime? minEndTime = null,
-            DateTime? maxEndTime = null)
+            DateTime? maxEndTime = null,
+            int? categoryId = null)
         {
-            var result = await _AuctionService.GetAllAsync(pageNumber, pageSize, searchQuery, condition, minCurrentPrice, maxCurrentPrice, minMaxPrice, maxMaxPrice, minEndTime, maxEndTime);
+            var result = await _AuctionService.GetAllAsync(pageNumber, pageSize, searchQuery, condition, minCurrentPrice, maxCurrentPrice, minMaxPrice, maxMaxPrice, minEndTime, maxEndTime, categoryId);
             return Ok(result);
         }
 
