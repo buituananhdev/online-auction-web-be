@@ -4,7 +4,8 @@ using OnlineAuctionWeb.Application;
 using OnlineAuctionWeb.Domain;
 using OnlineAuctionWeb.Domain.Mappings;
 using OnlineAuctionWeb.Infrastructure.Middleware;
-using System.Reflection;
+using OnlineAuctionWeb.Infrastructure;
+using OnlineAuctionWeb.Infrastructure.Hubs;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -15,7 +16,7 @@ builder.Services.AddDbContext<DataContext>(options =>
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
-
+builder.Services.AddSignalR();
 // Thêm dòng sau để thêm token JWT
 builder.Services.AddSwaggerGen(c =>
 {
@@ -57,6 +58,7 @@ builder.Services.AddSwaggerGen(c =>
 
 builder.Services.AddAutoMapper(typeof(AutoMapperProfile).Assembly);
 builder.Services.AddApplication(builder.Configuration);
+builder.Services.AddInfrastructure();
 
 var app = builder.Build();
 
@@ -83,4 +85,5 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 app.UseMiddleware<CustomExceptionMiddleware>();
 app.MapControllers();
+app.MapHub<AuctionHub>("/hubs/auction");
 app.Run();

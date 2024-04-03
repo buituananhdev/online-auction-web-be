@@ -1,12 +1,14 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
+using System.Text.Json;
 using OnlineAuctionWeb.Domain;
 using OnlineAuctionWeb.Domain.Dtos;
 using OnlineAuctionWeb.Domain.Enums;
 using OnlineAuctionWeb.Domain.Models;
 using OnlineAuctionWeb.Domain.Payloads;
 using OnlineAuctionWeb.Infrastructure.Exceptions;
+using System.Linq;
 
 namespace OnlineAuctionWeb.Application
 {
@@ -16,14 +18,14 @@ namespace OnlineAuctionWeb.Application
             int pageNumber,
             int pageSize,
             string searchQuery = null,
-            ConditionEnum? condition = null,
+            string? conditions = null,
             decimal? minCurrentPrice = null,
             decimal? maxCurrentPrice = null,
             decimal? minMaxPrice = null,
             decimal? maxMaxPrice = null,
             DateTime? minEndTime = null,
             DateTime? maxEndTime = null,
-            int? categoryId = null);
+            string? categoryIds = null);
         Task<AuctionDto> GetByIdAsync(int id);
         Task CreateAsync(CreateAuctionDto productDto, int userId);
         Task<AuctionDto> UpdateAsync(int id, AuctionDto productDto);
@@ -88,14 +90,14 @@ namespace OnlineAuctionWeb.Application
             int pageNumber,
             int pageSize,
             string searchQuery = null,
-            ConditionEnum? condition = null,
+            string? conditions = null,
             decimal? minCurrentPrice = null,
             decimal? maxCurrentPrice = null,
             decimal? minMaxPrice = null,
             decimal? maxMaxPrice = null,
             DateTime? minEndTime = null,
             DateTime? maxEndTime = null,
-            int? categoryId = null)
+            string? categoryIds = null)
         {
             try
             {
@@ -114,9 +116,10 @@ namespace OnlineAuctionWeb.Application
                 }
 
                 // Filter by condition
-                if (condition != null)
+                if (conditions != null)
                 {
-                    query = query.Where(a => a.Condition == condition);
+                    List<int> conditionInt = JsonSerializer.Deserialize<List<int>>(conditions);
+                    query = query.Where(a => conditionInt.Contains((int)a.Condition));
                 }
 
                 // Filter by current price range
@@ -150,9 +153,10 @@ namespace OnlineAuctionWeb.Application
                 }
 
                 // Filter by category
-                if (categoryId != null)
+                if (categoryIds != null)
                 {
-                    query = query.Where(a => a.CategoryId == categoryId);
+                    List<int> categoryIdsInt = JsonSerializer.Deserialize<List<int>>(categoryIds);
+                    query = query.Where(a => categoryIdsInt.Contains(a.CategoryId));
                 }
 
                 var totalAuctions = await query.CountAsync();
