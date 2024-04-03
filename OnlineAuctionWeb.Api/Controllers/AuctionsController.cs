@@ -1,7 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 using OnlineAuctionWeb.Application;
 using OnlineAuctionWeb.Domain.Dtos;
 using OnlineAuctionWeb.Domain.Enums;
+using OnlineAuctionWeb.Infrastructure.Hubs;
 
 namespace OnlineAuctionWeb.Api.Controllers
 {
@@ -10,9 +12,12 @@ namespace OnlineAuctionWeb.Api.Controllers
     public class AuctionsController : ControllerBase
     {
         private readonly IAuctionService _AuctionService;
-        public AuctionsController(IAuctionService AuctionService)
+        private readonly IHubContext<AuctionHub> _hubContext;
+
+        public AuctionsController(IAuctionService AuctionService, IHubContext<AuctionHub> hubContext)
         {
             _AuctionService = AuctionService;
+            _hubContext = hubContext;
         }
 
         /// <summary>
@@ -21,30 +26,30 @@ namespace OnlineAuctionWeb.Api.Controllers
         /// <param name="pageNumber">The page number for pagination.</param>
         /// <param name="pageSize">The size of each page.</param>
         /// <param name="searchQuery">Optional. A search query to filter auctions by name or description.</param>
-        /// <param name="condition">Optional. Filters auctions by their condition. 1: New, 2: Open box, 3: Used</param>
+        /// <param name="conditions">Optional. Filters auctions by their condition. 1: New, 2: Open box, 3: Used</param>
         /// <param name="minCurrentPrice">Optional. Filters auctions by the minimum current price.</param>
         /// <param name="maxCurrentPrice">Optional. Filters auctions by the maximum current price.</param>
         /// <param name="minMaxPrice">Optional. Filters auctions by the minimum maximum price (reserve price).</param>
         /// <param name="maxMaxPrice">Optional. Filters auctions by the maximum maximum price (reserve price).</param>
         /// <param name="minEndTime">Optional. Filters auctions by the minimum end time.</param>
         /// <param name="maxEndTime">Optional. Filters auctions by the maximum end time.</param>
-        /// <param name="categoryId">Optional. Filters auctions by category.</param>
+        /// <param name="categoryIds">Optional. Filters auctions by category.</param>
         /// <returns>Returns a paginated list of auctions based on the provided filters and pagination parameters.</returns>
         [HttpGet]
         public async Task<IActionResult> GetAllAsync(
             int pageNumber = 1,
             int pageSize = 10,
             string searchQuery = null,
-            ConditionEnum? condition = null,
+            string? conditions = null,
             decimal? minCurrentPrice = null,
             decimal? maxCurrentPrice = null,
             decimal? minMaxPrice = null,
             decimal? maxMaxPrice = null,
             DateTime? minEndTime = null,
             DateTime? maxEndTime = null,
-            int? categoryId = null)
+            string? categoryIds = null)
         {
-            var result = await _AuctionService.GetAllAsync(pageNumber, pageSize, searchQuery, condition, minCurrentPrice, maxCurrentPrice, minMaxPrice, maxMaxPrice, minEndTime, maxEndTime, categoryId);
+            var result = await _AuctionService.GetAllAsync(pageNumber, pageSize, searchQuery, conditions, minCurrentPrice, maxCurrentPrice, minMaxPrice, maxMaxPrice, minEndTime, maxEndTime, categoryIds);
             return Ok(result);
         }
 
@@ -57,6 +62,7 @@ namespace OnlineAuctionWeb.Api.Controllers
         public async Task<IActionResult> GetByIdAsync(int id)
         {
             var result = await _AuctionService.GetByIdAsync(id);
+            await _hubContext.Clients.All.SendAsync("UserJoinAuctionAsync", id);
             return Ok(result);
         }
 
