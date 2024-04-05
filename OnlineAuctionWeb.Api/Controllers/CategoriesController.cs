@@ -2,6 +2,8 @@
 using Microsoft.AspNetCore.Mvc;
 using OnlineAuctionWeb.Application;
 using OnlineAuctionWeb.Domain.Dtos;
+using OnlineAuctionWeb.Domain.Enums;
+using System.Threading.Tasks;
 
 namespace OnlineAuctionWeb.Api.Controllers
 {
@@ -29,10 +31,11 @@ namespace OnlineAuctionWeb.Api.Controllers
         /// <param name="categoryDto">The data for creating the category.</param>
         /// <returns>Returns the status code indicating success.</returns>
         [HttpPost]
+        [ProducesResponseType(StatusCodes.Status201Created)]
         public async Task<IActionResult> CreateAsync(CreateCategoryDto categoryDto)
         {
             await _categoryService.CreateAsync(categoryDto);
-            return StatusCode(201);
+            return StatusCode(StatusCodes.Status201Created);
         }
 
         /// <summary>
@@ -42,6 +45,7 @@ namespace OnlineAuctionWeb.Api.Controllers
         /// <param name="pageSize">The size of each page.</param>
         /// <returns>Returns a paginated list of categories.</returns>
         [HttpGet]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> GetAllAsync(int pageNumber = 1, int pageSize = 10)
         {
             var result = await _categoryService.GetAllAsync(pageNumber, pageSize);
@@ -54,9 +58,13 @@ namespace OnlineAuctionWeb.Api.Controllers
         /// <param name="id">The unique identifier of the category.</param>
         /// <returns>Returns the category with the specified identifier.</returns>
         [HttpGet("{id}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetByIdAsync(int id)
         {
             var result = await _categoryService.GetByIdAsync(id);
+            if (result == null)
+                return NotFound();
             return Ok(result);
         }
 
@@ -67,9 +75,14 @@ namespace OnlineAuctionWeb.Api.Controllers
         /// <param name="categoryDto">The updated data for the category.</param>
         /// <returns>Returns the updated category.</returns>
         [HttpPut("{id}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> UpdateAsync(int id, CategoryDto categoryDto)
         {
             var result = await _categoryService.UpdateAsync(id, categoryDto);
+            if (result == null)
+                return NotFound();
             return Ok(result);
         }
 
@@ -79,10 +92,35 @@ namespace OnlineAuctionWeb.Api.Controllers
         /// <param name="id">The unique identifier of the category to delete.</param>
         /// <returns>Returns the status code indicating success.</returns>
         [HttpDelete("{id}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> DeleteAsync(int id)
         {
             var result = await _categoryService.DeleteAsync(id);
+            if (result == null)
+                return NotFound();
             return Ok(result);
+        }
+
+        /// <summary>
+        /// Update the status of a category by its unique identifier.
+        /// </summary>
+        /// <remarks>
+        /// This endpoint allows updating the status of a category identified by its unique identifier.
+        /// </remarks>
+        /// <param name="id">The unique identifier of the category.</param>
+        /// <param name="status">The new status to be assigned to the category.</param>
+        /// <response code="200">Returns success if the status is updated successfully.</response>
+        /// <response code="404">If the category with the specified identifier is not found.</response>
+        /// <response code="400">If the provided status is invalid or any other request-related errors occur.</response>
+        [HttpPatch("{id}/status")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> ChangeStatusAsync(int id, StatusEnum status)
+        {
+            await _categoryService.ChangeStatusAsync(id, status);
+            return Ok();
         }
     }
 }
