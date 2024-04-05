@@ -1,14 +1,13 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
-using System.Text.Json;
 using OnlineAuctionWeb.Domain;
 using OnlineAuctionWeb.Domain.Dtos;
 using OnlineAuctionWeb.Domain.Enums;
 using OnlineAuctionWeb.Domain.Models;
 using OnlineAuctionWeb.Domain.Payloads;
 using OnlineAuctionWeb.Infrastructure.Exceptions;
-using System.Linq;
+using System.Text.Json;
 
 namespace OnlineAuctionWeb.Application
 {
@@ -30,6 +29,7 @@ namespace OnlineAuctionWeb.Application
         Task CreateAsync(CreateAuctionDto productDto, int userId);
         Task<AuctionDto> UpdateAsync(int id, AuctionDto productDto);
         Task<AuctionDto> DeleteAsync(int id);
+        Task CancelAsync(int id);
         Task SeedData(int count);
     }
     public class AuctionService : IAuctionService
@@ -42,6 +42,21 @@ namespace OnlineAuctionWeb.Application
             _context = context;
             _mapper = mapper;
             _feedbackService = feedbackService;
+        }
+
+        public async Task CancelAsync(int id)
+        {
+            try
+            {
+                var auction = await _context.Auctions.FindAsync(id);
+                auction.ProductStatus = ProductStatusEnum.Canceled;
+                await _context.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Err", ex.Message);
+                throw;
+            }
         }
 
         public async Task CreateAsync(CreateAuctionDto auctionDto, int userId)

@@ -1,9 +1,12 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using OnlineAuctionWeb.Domain;
 using OnlineAuctionWeb.Domain.Dtos;
+using OnlineAuctionWeb.Domain.Enums;
 using OnlineAuctionWeb.Domain.Models;
 using OnlineAuctionWeb.Domain.Payloads;
+using OnlineAuctionWeb.Infrastructure.Exceptions;
 
 namespace OnlineAuctionWeb.Application
 {
@@ -14,6 +17,8 @@ namespace OnlineAuctionWeb.Application
         Task<CategoryDto> GetByIdAsync(int id);
         Task<CategoryDto> UpdateAsync(int id, CategoryDto productDto);
         Task<CategoryDto> DeleteAsync(int id);
+        Task ChangeStatusAsync(int id, StatusEnum status);
+
     }
     public class CategoryService : ICategoryService
     {
@@ -24,6 +29,25 @@ namespace OnlineAuctionWeb.Application
         {
             _context = context;
             _mapper = mapper;
+        }
+
+        public async Task ChangeStatusAsync(int id, StatusEnum status)
+        {
+            try
+            {
+                var category = await _context.Categories.FindAsync(id);
+                if (category is null)
+                {
+                    throw new CustomException(StatusCodes.Status404NotFound, "Category not found!");
+                }
+
+                category.Status = status;
+                await _context.SaveChangesAsync();
+            } catch (Exception ex)
+            {
+                Console.WriteLine("Err", ex.Message);
+                throw;
+            }
         }
 
         public async Task CreateAsync(CreateCategoryDto categoryDto)

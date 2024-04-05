@@ -104,6 +104,17 @@ namespace OnlineAuctionWeb.Api.Controllers
             return Ok(result);
         }
 
+        /// <summary>
+        /// Cancel product by its unique identifier.
+        /// <param name="id">The unique identifier of the auction to cancel.</param>
+        /// <returns>Returns the status code indicating success.</returns>
+        [HttpPatch("{id}/cancel")]
+        public async Task<IActionResult> CancelAsync(int id)
+        {
+            await _AuctionService.CancelAsync(id);
+            return Ok();
+        }
+
         [HttpPost("seed")]
         public async Task<IActionResult> SeedAuctions(int count)
         {
