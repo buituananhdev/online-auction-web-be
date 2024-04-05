@@ -4,6 +4,9 @@ using OnlineAuctionWeb.Application;
 using OnlineAuctionWeb.Domain.Dtos;
 using OnlineAuctionWeb.Domain.Enums;
 using OnlineAuctionWeb.Infrastructure.Hubs;
+using System;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace OnlineAuctionWeb.Api.Controllers
 {
@@ -11,12 +14,12 @@ namespace OnlineAuctionWeb.Api.Controllers
     [ApiController]
     public class AuctionsController : ControllerBase
     {
-        private readonly IAuctionService _AuctionService;
+        private readonly IAuctionService _auctionService;
         private readonly IHubContext<AuctionHub> _hubContext;
 
-        public AuctionsController(IAuctionService AuctionService, IHubContext<AuctionHub> hubContext)
+        public AuctionsController(IAuctionService auctionService, IHubContext<AuctionHub> hubContext)
         {
-            _AuctionService = AuctionService;
+            _auctionService = auctionService;
             _hubContext = hubContext;
         }
 
@@ -49,7 +52,7 @@ namespace OnlineAuctionWeb.Api.Controllers
             DateTime? maxEndTime = null,
             string? categoryIds = null)
         {
-            var result = await _AuctionService.GetAllAsync(pageNumber, pageSize, searchQuery, conditions, minCurrentPrice, maxCurrentPrice, minMaxPrice, maxMaxPrice, minEndTime, maxEndTime, categoryIds);
+            var result = await _auctionService.GetAllAsync(pageNumber, pageSize, searchQuery, conditions, minCurrentPrice, maxCurrentPrice, minMaxPrice, maxMaxPrice, minEndTime, maxEndTime, categoryIds);
             return Ok(result);
         }
 
@@ -61,7 +64,7 @@ namespace OnlineAuctionWeb.Api.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> GetByIdAsync(int id)
         {
-            var result = await _AuctionService.GetByIdAsync(id);
+            var result = await _auctionService.GetByIdAsync(id);
             await _hubContext.Clients.All.SendAsync("UserJoinAuctionAsync", id);
             return Ok(result);
         }
@@ -69,13 +72,13 @@ namespace OnlineAuctionWeb.Api.Controllers
         /// <summary>
         /// Creates a new auction.
         /// </summary>
-        /// <param name="AuctionDto">The data for creating the auction.</param>
+        /// <param name="auctionDto">The data for creating the auction.</param>
         /// <returns>Returns the status code indicating success.</returns>
         [HttpPost]
-        public async Task<IActionResult> CreateAsync(CreateAuctionDto AuctionDto)
+        public async Task<IActionResult> CreateAsync(CreateAuctionDto auctionDto)
         {
             var userId = User.Claims.FirstOrDefault(c => c.Type == "ID")?.Value;
-            await _AuctionService.CreateAsync(AuctionDto, int.Parse(userId));
+            await _auctionService.CreateAsync(auctionDto, int.Parse(userId));
             return StatusCode(201);
         }
 
@@ -83,42 +86,49 @@ namespace OnlineAuctionWeb.Api.Controllers
         /// Updates an existing auction.
         /// </summary>
         /// <param name="id">The unique identifier of the auction to update.</param>
-        /// <param name="AuctionDto">The updated data for the auction.</param>
+        /// <param name="auctionDto">The updated data for the auction.</param>
         /// <returns>Returns the updated auction.</returns>
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateAsync(int id, AuctionDto AuctionDto)
+        public async Task<IActionResult> UpdateAsync(int id, AuctionDto auctionDto)
         {
-            var result = await _AuctionService.UpdateAsync(id, AuctionDto);
+            var result = await _auctionService.UpdateAsync(id, auctionDto);
             return Ok(result);
         }
 
         /// <summary>
-        /// Deletes a auction by its unique identifier.
+        /// Deletes an auction by its unique identifier.
         /// </summary>
         /// <param name="id">The unique identifier of the auction to delete.</param>
         /// <returns>Returns the status code indicating success.</returns>
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteAsync(int id)
         {
-            var result = await _AuctionService.DeleteAsync(id);
+            var result = await _auctionService.DeleteAsync(id);
             return Ok(result);
         }
 
         /// <summary>
-        /// Cancel product by its unique identifier.
+        /// Cancels an auction by its unique identifier.
+        /// </summary>
         /// <param name="id">The unique identifier of the auction to cancel.</param>
+        /// <param name="status">The new status to be assigned to the auction.</param>
         /// <returns>Returns the status code indicating success.</returns>
         [HttpPatch("{id}/cancel")]
-        public async Task<IActionResult> CancelAsync(int id)
+        public async Task<IActionResult> ChangeStatusAsync(int id, ProductStatusEnum status)
         {
-            await _AuctionService.CancelAsync(id);
+            await _auctionService.ChangeStatusAsync(id, status);
             return Ok();
         }
 
+        /// <summary>
+        /// Seeds the database with the specified number of auctions.
+        /// </summary>
+        /// <param name="count">The number of auctions to seed.</param>
+        /// <returns>Returns the status code indicating success.</returns>
         [HttpPost("seed")]
         public async Task<IActionResult> SeedAuctions(int count)
         {
-            await _AuctionService.SeedData(count);
+            await _auctionService.SeedData(count);
             return StatusCode(201);
         }
     }

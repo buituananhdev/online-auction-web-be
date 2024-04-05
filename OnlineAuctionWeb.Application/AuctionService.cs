@@ -29,7 +29,7 @@ namespace OnlineAuctionWeb.Application
         Task CreateAsync(CreateAuctionDto productDto, int userId);
         Task<AuctionDto> UpdateAsync(int id, AuctionDto productDto);
         Task<AuctionDto> DeleteAsync(int id);
-        Task CancelAsync(int id);
+        Task ChangeStatusAsync(int id, ProductStatusEnum status);
         Task SeedData(int count);
     }
     public class AuctionService : IAuctionService
@@ -44,12 +44,17 @@ namespace OnlineAuctionWeb.Application
             _feedbackService = feedbackService;
         }
 
-        public async Task CancelAsync(int id)
+        public async Task ChangeStatusAsync(int id, ProductStatusEnum status)
         {
             try
             {
                 var auction = await _context.Auctions.FindAsync(id);
-                auction.ProductStatus = ProductStatusEnum.Canceled;
+                if(auction is null)
+                {
+                    throw new CustomException(StatusCodes.Status404NotFound, "Auction not found!");
+                }
+
+                auction.ProductStatus = status;
                 await _context.SaveChangesAsync();
             }
             catch (Exception ex)
