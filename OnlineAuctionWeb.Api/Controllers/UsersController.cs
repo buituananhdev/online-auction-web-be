@@ -37,7 +37,7 @@ namespace OnlineAuctionWeb.Api.Controllers
         public async Task<IActionResult> GetUsers(
             [FromQuery] int page = 1, 
             [FromQuery] int pageSize = 10, 
-            [FromQuery] string searchQuery = null, 
+            [FromQuery] string? searchQuery = null, 
             [FromQuery] StatusEnum status = 0)
         {
             var users = await _userService.GetAllAsync(page, pageSize, searchQuery, status);
@@ -63,7 +63,7 @@ namespace OnlineAuctionWeb.Api.Controllers
         /// <param name="userDto">The data for creating the new user.</param>
         /// <returns>Returns the created user.</returns>
         [HttpPost]
-        [RolesAuthorize(RequiredRoles = new int[] { (int)RoleEnum.Admin })]
+        //[RolesAuthorize(RequiredRoles = new int[] { (int)RoleEnum.Admin })]
         public async Task<IActionResult> CreateUser([FromBody] CreateUserDto userDto)
         {
             await _userService.CreateAsync(userDto);

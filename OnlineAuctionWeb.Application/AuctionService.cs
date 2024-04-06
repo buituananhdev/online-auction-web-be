@@ -8,6 +8,7 @@ using OnlineAuctionWeb.Domain.Models;
 using OnlineAuctionWeb.Domain.Payloads;
 using OnlineAuctionWeb.Infrastructure.Exceptions;
 using System.Text.Json;
+using System.Text.RegularExpressions;
 
 namespace OnlineAuctionWeb.Application
 {
@@ -30,6 +31,8 @@ namespace OnlineAuctionWeb.Application
         Task<AuctionDto> UpdateAsync(int id, AuctionDto productDto);
         Task<AuctionDto> DeleteAsync(int id);
         Task ChangeStatusAsync(int id, ProductStatusEnum status);
+        Task UpdateCurrentPriceAsync(int id, decimal price);
+        Task UpdateProductStatusAsync(int id, ProductStatusEnum status);
         Task SeedData(int count);
     }
     public class AuctionService : IAuctionService
@@ -263,6 +266,38 @@ namespace OnlineAuctionWeb.Application
         public Task<AuctionDto> UpdateAsync(int id, AuctionDto productDto)
         {
             throw new NotImplementedException();
+        }
+
+        public async Task UpdateCurrentPriceAsync(int id, decimal price)
+        {
+            try
+            {
+                var auction = await _context.Auctions.FindAsync(id);
+
+                auction.CurrentPrice = price;
+                await _context.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Err", ex.Message);
+                throw;
+            }
+        }
+
+        public async Task UpdateProductStatusAsync(int id, ProductStatusEnum status)
+        {
+            try
+            {
+                var auction = await _context.Auctions.FindAsync(id);
+
+                auction.ProductStatus = status;
+                await _context.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Err", ex.Message);
+                throw;
+            }
         }
     }
 }
