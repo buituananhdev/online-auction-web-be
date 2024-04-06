@@ -78,7 +78,7 @@ namespace OnlineAuctionWeb.Api.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> UpdateAsync(int id, CategoryDto categoryDto)
+        public async Task<IActionResult> UpdateAsync(int id, UpdateCategoryDto categoryDto)
         {
             var result = await _categoryService.UpdateAsync(id, categoryDto);
             if (result == null)
