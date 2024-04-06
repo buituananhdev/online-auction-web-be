@@ -20,7 +20,7 @@ namespace OnlineAuctionWeb.Application
         Task<UserDto> GetByIdAsync(int id);
         Task CreateAsync(CreateUserDto userDto);
         Task<UserDto> CreateGoogleUserAsync(CreateUserDto userDto);
-        Task<UserDto> UpdateAsync(int id, UserDto userDto);
+        Task<UserDto> UpdateAsync(int id, UpdateUserDto userDto);
         Task DeleteAsync(int id);
         UserDto FindUserByEmailAsync(string email);
         Task<bool> UserExistsByEmailAsync(string email);
@@ -175,9 +175,25 @@ namespace OnlineAuctionWeb.Application
             return await _context.Users.AnyAsync(u => u.Email == email);
         }
 
-        public Task<UserDto> UpdateAsync(int id, UserDto userDto)
+        public async Task<UserDto> UpdateAsync(int id, UpdateUserDto userDto)
         {
-            throw new NotImplementedException();
+            try
+            {
+                var user = await _context.Users.FindAsync(id);
+                if (user == null)
+                {
+                    throw new CustomException(StatusCodes.Status404NotFound, "User not found!");
+                }
+
+                _mapper.Map(userDto, user);
+                await _context.SaveChangesAsync();
+                return _mapper.Map<UserDto>(user);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Err", ex.Message);
+                throw;
+            }
         }
 
         public async Task<int> GetUserRoleByIdAsync(int id)
