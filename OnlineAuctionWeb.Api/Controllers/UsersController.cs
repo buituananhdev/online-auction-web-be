@@ -79,7 +79,7 @@ namespace OnlineAuctionWeb.Api.Controllers
         [HttpPut]
         [Route("{id}")]
         [RolesAuthorize(RequiredRoles = new int[] { (int)RoleEnum.Admin })]
-        public async Task<IActionResult> UpdateUser(int id, [FromBody] UserDto userDto)
+        public async Task<IActionResult> UpdateUser(int id, [FromBody] UpdateUserDto userDto)
         {
             var user = await _userService.UpdateAsync(id, userDto);
             return Ok(user);

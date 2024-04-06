@@ -1,6 +1,5 @@
 ﻿using AutoMapper;
 using OnlineAuctionWeb.Domain.Dtos;
-using OnlineAuctionWeb.Domain.Enums;
 using OnlineAuctionWeb.Domain.Models;
 
 namespace OnlineAuctionWeb.Application.Mappings
@@ -13,6 +12,7 @@ namespace OnlineAuctionWeb.Application.Mappings
             CreateMap<User, UserDto>().ReverseMap();
             CreateMap<CreateUserDto, RegisterDto>().ReverseMap();
             CreateMap<User, CreateUserDto>().ReverseMap();
+            CreateMap<UserDto, UpdateUserDto>().ReverseMap();
 
             // Auction profile
             CreateMap<Auction, AuctionDto>().ReverseMap();
@@ -21,6 +21,7 @@ namespace OnlineAuctionWeb.Application.Mappings
             // Category profile
             CreateMap<Category, CreateCategoryDto>().ReverseMap();
             CreateMap<Category, CategoryDto>().ReverseMap();
+            CreateMap<CategoryDto, UpdateCategoryDto>().ReverseMap();
 
             // Bid profile
             CreateMap<Bid, BidDto>().ReverseMap();
