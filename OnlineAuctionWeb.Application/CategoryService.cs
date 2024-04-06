@@ -15,7 +15,7 @@ namespace OnlineAuctionWeb.Application
         Task CreateAsync(CreateCategoryDto categoryDto);
         Task<PaginatedResult<CategoryDto>> GetAllAsync(int pageNumber, int pageSize);
         Task<CategoryDto> GetByIdAsync(int id);
-        Task<CategoryDto> UpdateAsync(int id, CategoryDto productDto);
+        Task<CategoryDto> UpdateAsync(int id, UpdateCategoryDto productDto);
         Task<CategoryDto> DeleteAsync(int id);
         Task ChangeStatusAsync(int id, StatusEnum status);
 
@@ -108,9 +108,25 @@ namespace OnlineAuctionWeb.Application
             throw new NotImplementedException();
         }
 
-        public Task<CategoryDto> UpdateAsync(int id, CategoryDto productDto)
+        public async Task<CategoryDto> UpdateAsync(int id, UpdateCategoryDto categoryDto)
         {
-            throw new NotImplementedException();
+            try
+            {
+                var category = await _context.Categories.FindAsync(id);
+                if (category is null)
+                {
+                    throw new CustomException(StatusCodes.Status404NotFound, "Category not found!");
+                }
+
+                _mapper.Map(categoryDto, category);
+                await _context.SaveChangesAsync();
+                return _mapper.Map<CategoryDto>(category);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Err", ex.Message);
+                throw;
+            }
         }
     }
 }
