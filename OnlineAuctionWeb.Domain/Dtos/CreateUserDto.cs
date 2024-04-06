@@ -18,7 +18,7 @@ namespace OnlineAuctionWeb.Domain.Dtos
         public string Address { get; set; } = string.Empty;
 
         [Required(ErrorMessage = "Password is required")]
-        [StringLength(50, MinimumLength = 6, ErrorMessage = "Password must be between 6 and 50 characters")]
+        [StringLength(32, MinimumLength = 8, ErrorMessage = "Password must be between 8 and 32 characters")]
         public string Password { get; set; }
 
         public string Avatar { get; set; }

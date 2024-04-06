@@ -1,9 +1,4 @@
 ﻿using Microsoft.AspNetCore.SignalR;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace OnlineAuctionWeb.Infrastructure.Hubs
 {
@@ -11,7 +6,7 @@ namespace OnlineAuctionWeb.Infrastructure.Hubs
     {
         public AuctionHub()
         {
-            
+
         }
 
         public override async Task OnConnectedAsync()
@@ -19,6 +14,7 @@ namespace OnlineAuctionWeb.Infrastructure.Hubs
             Console.WriteLine("User connected");
             await Clients.All.SendAsync("UserConnected1111", Context.ConnectionId);
             await base.OnConnectedAsync();
+
         }
 
         public override async Task OnDisconnectedAsync(Exception exception)
@@ -38,7 +34,7 @@ namespace OnlineAuctionWeb.Infrastructure.Hubs
             await Groups.RemoveFromGroupAsync(Context.ConnectionId, $"Auction-{auctionId}");
             await Clients.Caller.SendAsync("LeftAuction", auctionId);
         }
-        
+
         public async Task UpdatePriceAsync(int auctionId, decimal price)
         {
             await Clients.Group($"Auction-{auctionId}").SendAsync("BidPlaced", auctionId, price);
