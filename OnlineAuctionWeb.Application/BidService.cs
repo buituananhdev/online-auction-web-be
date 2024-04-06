@@ -6,10 +6,6 @@ using OnlineAuctionWeb.Domain.Dtos;
 using OnlineAuctionWeb.Domain.Enums;
 using OnlineAuctionWeb.Domain.Payloads;
 using OnlineAuctionWeb.Infrastructure.Exceptions;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace OnlineAuctionWeb.Application
 {
@@ -26,7 +22,7 @@ namespace OnlineAuctionWeb.Application
         private readonly IAuctionService _auctionService;
         private readonly ProductStatusEnum[] INVALID_AUCTION_STATUSES = new[]
         {
-            ProductStatusEnum.Canceled, ProductStatusEnum.Sold, ProductStatusEnum.PendingPublish
+            ProductStatusEnum.Canceled, ProductStatusEnum.Ended, ProductStatusEnum.PendingPublish
         };
 
         public BidService(DataContext context, IMapper mapper, IAuctionService auctionService)
@@ -42,7 +38,7 @@ namespace OnlineAuctionWeb.Application
             {
                 bidDto.UserId = int.Parse(userId);
                 var auction = await _auctionService.GetByIdAsync(bidDto.AuctionId);
-                if (bidDto.BidAmount <= auction.CurrentPrice)
+                if (bidDto.BidAmount <= auction.CurrentPrice || bidDto.BidAmount > auction.MaxPrice)
                 {
                     throw new CustomException(StatusCodes.Status400BadRequest, "Invalid bid amount!");
                 }
@@ -51,6 +47,11 @@ namespace OnlineAuctionWeb.Application
                 if (currentTimestamp > auction.EndTime || INVALID_AUCTION_STATUSES.Contains(auction.ProductStatus))
                 {
                     throw new CustomException(StatusCodes.Status400BadRequest, "Auction is not available for bidding!");
+                }
+
+                if (bidDto.BidAmount == auction.MaxPrice)
+                {
+                    await _auctionService.UpdateProductStatusAsync(auction.Id, ProductStatusEnum.Ended);
                 }
 
                 await _context.Bids.AddAsync(_mapper.Map<Domain.Models.Bid>(bidDto));

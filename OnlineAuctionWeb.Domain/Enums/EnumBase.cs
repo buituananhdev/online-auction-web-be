@@ -23,7 +23,7 @@
     public enum ProductStatusEnum
     {
         Available = 1,
-        Sold = 2,
+        Ended = 2,
         Deleted = 3,
         Canceled = 4,
         PendingPublish = 5
