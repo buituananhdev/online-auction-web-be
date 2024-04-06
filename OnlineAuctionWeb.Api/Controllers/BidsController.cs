@@ -33,6 +33,12 @@ namespace OnlineAuctionWeb.Api.Controllers
             return Ok(bids);
         }
 
+
+        /// <summary>
+        /// Creates a new bid.
+        /// </summary>
+        /// <param name="bidDto">Bid information.</param>
+        /// <returns>Status 201 if successful, or status 400 if bad request.</returns>
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
