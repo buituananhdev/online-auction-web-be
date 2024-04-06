@@ -1,12 +1,14 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using OnlineAuctionWeb.Domain;
 using OnlineAuctionWeb.Domain.Dtos;
+using OnlineAuctionWeb.Domain.Enums;
 using OnlineAuctionWeb.Domain.Payloads;
+using OnlineAuctionWeb.Infrastructure.Exceptions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace OnlineAuctionWeb.Application
@@ -14,16 +16,51 @@ namespace OnlineAuctionWeb.Application
     public interface IBidService
     {
         Task<PaginatedResult<BidDto>> GetAllAsync(int pageNumber, int pageSize);
+        Task CreateAsync(CreateBidDto bidDto, string userId);
     }
 
     public class BidService : IBidService
     {
         private readonly DataContext _context;
         private readonly IMapper _mapper;
-        public BidService(DataContext context, IMapper mapper)
+        private readonly IAuctionService _auctionService;
+        private readonly ProductStatusEnum[] INVALID_AUCTION_STATUSES = new[]
+        {
+            ProductStatusEnum.Canceled, ProductStatusEnum.Sold, ProductStatusEnum.PendingPublish
+        };
+
+        public BidService(DataContext context, IMapper mapper, IAuctionService auctionService)
         {
             _context = context;
             _mapper = mapper;
+            _auctionService = auctionService;
+        }
+
+        public async Task CreateAsync(CreateBidDto bidDto, string userId)
+        {
+            try
+            {
+                bidDto.UserId = int.Parse(userId);
+                var auction = await _auctionService.GetByIdAsync(bidDto.AuctionId);
+                if (bidDto.BidAmount <= auction.CurrentPrice)
+                {
+                    throw new CustomException(StatusCodes.Status400BadRequest, "Invalid bid amount!");
+                }
+
+                var currentTimestamp = DateTime.Now;
+                if (currentTimestamp > auction.EndTime || INVALID_AUCTION_STATUSES.Contains(auction.ProductStatus))
+                {
+                    throw new CustomException(StatusCodes.Status400BadRequest, "Auction is not available for bidding!");
+                }
+
+                await _context.Bids.AddAsync(_mapper.Map<Domain.Models.Bid>(bidDto));
+                await _auctionService.UpdateCurrentPriceAsync(bidDto.AuctionId, bidDto.BidAmount);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Err", ex);
+                throw;
+            }
         }
 
         public async Task<PaginatedResult<BidDto>> GetAllAsync(int pageNumber, int pageSize)

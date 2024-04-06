@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using OnlineAuctionWeb.Application;
+using OnlineAuctionWeb.Domain.Dtos;
 
 namespace OnlineAuctionWeb.Api.Controllers
 {
@@ -30,6 +31,16 @@ namespace OnlineAuctionWeb.Api.Controllers
         {
             var bids = await _bidService.GetAllAsync(page, pageSize);
             return Ok(bids);
+        }
+
+        [HttpPost]
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> CreateBid([FromBody] CreateBidDto bidDto)
+        {
+            var userId = User.Claims.FirstOrDefault(c => c.Type == "ID")?.Value;
+            await _bidService.CreateAsync(bidDto, userId);
+            return StatusCode(201);
         }
     }
 }
