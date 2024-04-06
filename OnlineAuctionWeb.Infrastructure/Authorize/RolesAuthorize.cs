@@ -2,9 +2,8 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.EntityFrameworkCore;
-using OnlineAuctionWeb.Domain;
+using OnlineAuctionWeb.Domain.Enums;
 using OnlineAuctionWeb.Infrastructure.Exceptions;
-using System.Data;
 using System.Security.Claims;
 
 namespace OnlineAuctionWeb.Infrastructure.Authorize
@@ -12,9 +11,9 @@ namespace OnlineAuctionWeb.Infrastructure.Authorize
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, AllowMultiple = true, Inherited = true)]
     public class RolesAuthorize : AuthorizeAttribute, IAsyncAuthorizationFilter
     {
-        public int[] RequiredRoles { get; set; }
+        public RoleEnum[] RequiredRoles { get; set; }
 
-        public RolesAuthorize(params int[] roles)
+        public RolesAuthorize(params RoleEnum[] roles)
         {
             RequiredRoles = roles;
         }
@@ -27,7 +26,7 @@ namespace OnlineAuctionWeb.Infrastructure.Authorize
                 throw new CustomException(StatusCodes.Status403Forbidden, "You do not have access to this resource!");
             }
 
-            if (!RequiredRoles.Contains(int.Parse(userRole)))
+            if (!RequiredRoles.Select(r => r.ToString()).Contains(userRole))
             {
                 throw new CustomException(StatusCodes.Status403Forbidden, "You do not have access to this resource!");
             }
