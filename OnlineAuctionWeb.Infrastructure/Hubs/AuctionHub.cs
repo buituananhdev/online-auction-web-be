@@ -33,7 +33,7 @@ namespace OnlineAuctionWeb.Infrastructure.Hubs
                 }
 
                 Console.WriteLine("User connected");
-                int userId = (int)_currentUserService.UserId;
+                int userId = _currentUserService.UserId;
                 var watchList = await _watchListService.GetListAuctionIdsByUserIDAsync(userId);
 
                 var userConnection = Users.GetOrAdd(
@@ -74,7 +74,7 @@ namespace OnlineAuctionWeb.Infrastructure.Hubs
                 {
                     throw new CustomException(StatusCodes.Status401Unauthorized, "Invalid token!");
                 }
-                var userId = (int)_currentUserService.UserId;
+                var userId = _currentUserService.UserId;
                 var connectionId = Context.ConnectionId;
                 var userConnection = Users.GetOrAdd(
                     userId,

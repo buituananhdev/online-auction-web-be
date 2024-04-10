@@ -10,7 +10,6 @@ namespace OnlineAuctionWeb.Domain.Dtos
     public class CreateBidDto
     {
         public int AuctionId { get; set; }
-        public int UserId { get; set; }
         public decimal BidAmount { get; set; }
     }
 }

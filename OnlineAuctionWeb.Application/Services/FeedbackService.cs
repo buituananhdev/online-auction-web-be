@@ -1,11 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
-using OnlineAuctionWeb.Domain;
+﻿using OnlineAuctionWeb.Domain;
 using OnlineAuctionWeb.Domain.Payloads;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace OnlineAuctionWeb.Application.Services
 {
@@ -33,7 +27,7 @@ namespace OnlineAuctionWeb.Application.Services
                 AvarageRating = averageRating,
                 TotalRatings = context.Feedbacks.Count(f => f.ToUserId == userId)
             };
-            
+
             return payload;
         }
     }

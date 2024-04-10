@@ -35,7 +35,7 @@ namespace OnlineAuctionWeb.Application.Services
                     throw new CustomException(StatusCodes.Status401Unauthorized, "Invalid token!");
                 }
 
-                createWatchListDto.UserId = (int)_currentUserService.UserId;
+                createWatchListDto.UserId = _currentUserService.UserId;
                 _context.WatchList.Add(_mapper.Map<WatchList>(createWatchListDto));
                 await _context.SaveChangesAsync();
             }

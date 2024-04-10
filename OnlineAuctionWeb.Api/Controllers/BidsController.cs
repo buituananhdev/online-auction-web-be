@@ -33,7 +33,6 @@ namespace OnlineAuctionWeb.Api.Controllers
             return Ok(bids);
         }
 
-
         /// <summary>
         /// Creates a new bid.
         /// </summary>
@@ -44,8 +43,7 @@ namespace OnlineAuctionWeb.Api.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> CreateBid([FromBody] CreateBidDto bidDto)
         {
-            var userId = User.Claims.FirstOrDefault(c => c.Type == "ID")?.Value;
-            await _bidService.CreateAsync(bidDto, userId);
+            await _bidService.CreateAsync(bidDto);
             return StatusCode(201);
         }
     }

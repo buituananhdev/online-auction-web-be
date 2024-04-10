@@ -27,7 +27,7 @@ namespace OnlineAuctionWeb.Application.Services
             DateTime? maxEndTime = null,
             string? categoryIds = null);
         Task<AuctionDto> GetByIdAsync(int id);
-        Task CreateAsync(CreateAuctionDto productDto);
+        Task<AuctionDto> CreateAsync(CreateAuctionDto productDto);
         Task<AuctionDto> UpdateAsync(int id, AuctionDto productDto);
         Task<AuctionDto> DeleteAsync(int id);
         Task ChangeStatusAsync(int id, ProductStatusEnum status);
@@ -72,20 +72,22 @@ namespace OnlineAuctionWeb.Application.Services
             }
         }
 
-        public async Task CreateAsync(CreateAuctionDto auctionDto)
+        public async Task<AuctionDto> CreateAsync(CreateAuctionDto auctionDto)
         {
             try
             {
                 if(_currentUserService.UserId == null)
                 {
                     throw new CustomException(StatusCodes.Status401Unauthorized, "Invalid token!");
-                } 
+                }
 
                 var auction = _mapper.Map<Auction>(auctionDto);
-                auction.UserId = (int)_currentUserService.UserId;
+                auction.UserId = _currentUserService.UserId;
                 auction.CurrentPrice = auction.StartingPrice;
                 _context.Auctions.Add(auction);
                 await _context.SaveChangesAsync();
+
+                return _mapper.Map<AuctionDto>(auction); 
             }
             catch (Exception ex)
             {
@@ -242,7 +244,10 @@ namespace OnlineAuctionWeb.Application.Services
             {
                 throw new CustomException(StatusCodes.Status404NotFound, "Auction not found!");
             }
-            return _mapper.Map<AuctionDto>(auction);
+
+            var auctionDto = _mapper.Map<AuctionDto>(auction);
+            auctionDto.BidCount = auction.Bids.Count();
+            return auctionDto;
         }
 
         public async Task<List<AuctionDto>> GetListRecentlyViewedAsync()
@@ -255,7 +260,7 @@ namespace OnlineAuctionWeb.Application.Services
                 }
 
                 var auctions = await _context.WatchList
-                .Where(wl => wl.UserId == _currentUserService.UserId && wl.Type == WatchListTypeEnum.RecenttlyViewed)
+                .Where(wl => wl.UserId == _currentUserService.UserId && wl.Type == WatchListTypeEnum.RecentlyViewed)
                 .Select(wl => wl.Auction)
                 .Include(a => a.User)
                 .Include(a => a.Category)
@@ -277,9 +282,25 @@ namespace OnlineAuctionWeb.Application.Services
                 .Where(a => a.EndTime > DateTime.Now && a.Bids.Any())
                 .OrderByDescending(a => a.Bids.Count)
                 .Take(10)
+                .Select(a => new AuctionDto
+                {
+                    Id = a.Id,
+                    ProductName = a.ProductName,
+                    Description = a.Description,
+                    Condition = a.Condition,
+                    StartingPrice = a.StartingPrice,
+                    MaxPrice = a.MaxPrice,
+                    CurrentPrice = a.CurrentPrice,
+                    EndTime = a.EndTime,
+                    BidCount = a.Bids.Count,
+                    ProductStatus = a.ProductStatus,
+                    ViewCount = a.ViewCount,
+                    User = _mapper.Map<UserDto>(a.User),
+                    CategoryName = a.Category.CategoryName
+                })
                 .ToListAsync();
 
-                return _mapper.Map<List<AuctionDto>>(topAuctions);
+                return topAuctions;
             }
             catch (Exception ex)
             {
