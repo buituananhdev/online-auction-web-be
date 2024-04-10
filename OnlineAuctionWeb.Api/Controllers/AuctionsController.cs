@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
-using OnlineAuctionWeb.Application;
+using OnlineAuctionWeb.Application.Services;
 using OnlineAuctionWeb.Domain.Dtos;
 using OnlineAuctionWeb.Domain.Enums;
 using OnlineAuctionWeb.Infrastructure.Hubs;
@@ -77,8 +77,7 @@ namespace OnlineAuctionWeb.Api.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateAsync(CreateAuctionDto auctionDto)
         {
-            var userId = User.Claims.FirstOrDefault(c => c.Type == "ID")?.Value;
-            await _auctionService.CreateAsync(auctionDto, int.Parse(userId));
+            await _auctionService.CreateAsync(auctionDto);
             return StatusCode(201);
         }
 
@@ -130,6 +129,28 @@ namespace OnlineAuctionWeb.Api.Controllers
         {
             await _auctionService.SeedData(count);
             return StatusCode(201);
+        }
+
+        /// <summary>
+        /// Retrieves the list of recently viewed auctions.
+        /// </summary>
+        /// <returns>Returns the list of recently viewed auctions.</returns>
+        [HttpGet("recently-viewed")]
+        public async Task<IActionResult> GetRecentlyViewed()
+        {
+            var result = await _auctionService.GetListRecentlyViewedAsync();
+            return Ok(result);
+        }
+
+        /// <summary>
+        /// Retrieves the top 10 most popular auctions based on bid count.
+        /// </summary>
+        /// <returns>Returns the list of top 10 most popular auctions.</returns>
+        [HttpGet("top-10")]
+        public async Task<IActionResult> GetMostPopular()
+        {
+            var result = await _auctionService.GetTop10Auctions();
+            return Ok(result);
         }
     }
 }

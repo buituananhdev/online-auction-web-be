@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
+using OnlineAuctionWeb.Application.Services;
 using System.Text;
 
 namespace OnlineAuctionWeb.Application
@@ -16,6 +17,10 @@ namespace OnlineAuctionWeb.Application
             services.AddScoped<ICategoryService, CategoryService>();
             services.AddScoped<IBidService, BidService>();
             services.AddScoped<IFeedbackService, FeedbackService>();
+            services.AddScoped<IWatchListService, WatchListService>();
+            services.AddScoped<ICurrentUserService, CurrentUserService>();
+            services.AddHttpContextAccessor();
+
             var key = Encoding.ASCII.GetBytes(configration.GetSection("JwtSettings:Secret").Value!);
             services.AddAuthentication(x =>
             {

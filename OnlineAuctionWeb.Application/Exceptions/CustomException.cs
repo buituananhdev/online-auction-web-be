@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace OnlineAuctionWeb.Infrastructure.Exceptions
+namespace OnlineAuctionWeb.Application.Exceptions
 {
     public class CustomException : Exception
     {

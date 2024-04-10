@@ -27,6 +27,7 @@ namespace OnlineAuctionWeb.Infrastructure.Utils
                 Subject = new ClaimsIdentity(new Claim[]
                 {
                     new Claim("ID", user.Id.ToString()),
+                    new Claim(ClaimTypes.Email, user.Email),
                     new Claim(ClaimTypes.Role, user.Role.ToString()),
 
                 }),

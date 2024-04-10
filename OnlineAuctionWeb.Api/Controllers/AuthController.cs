@@ -3,11 +3,11 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
-using OnlineAuctionWeb.Application;
 using OnlineAuctionWeb.Domain.Dtos;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using OnlineAuctionWeb.Domain.Enums;
+using OnlineAuctionWeb.Application.Services;
 
 namespace OnlineAuctionWeb.Api.Controllers
 {

@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
-using OnlineAuctionWeb.Infrastructure.Exceptions;
+using OnlineAuctionWeb.Application.Exceptions;
 
 namespace OnlineAuctionWeb.Infrastructure.Middleware
 {

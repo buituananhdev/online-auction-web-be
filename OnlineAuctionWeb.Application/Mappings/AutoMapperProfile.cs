@@ -26,6 +26,9 @@ namespace OnlineAuctionWeb.Application.Mappings
             // Bid profile
             CreateMap<Bid, BidDto>().ReverseMap();
             CreateMap<Bid, CreateBidDto>().ReverseMap();
+
+            // WatchList profile
+            CreateMap<WatchList, CreateWatchListDto>().ReverseMap();
         }
     }
 }

@@ -21,9 +21,9 @@ namespace OnlineAuctionWeb.Domain
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Auction>()
-                .HasOne(p => p.Seller)
+                .HasOne(p => p.User)
                 .WithMany(u => u.Products)
-                .HasForeignKey(p => p.SellerId)
+                .HasForeignKey(p => p.UserId)
                 .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<Feedback>()

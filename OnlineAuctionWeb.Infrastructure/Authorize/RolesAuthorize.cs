@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.EntityFrameworkCore;
 using OnlineAuctionWeb.Domain.Enums;
-using OnlineAuctionWeb.Infrastructure.Exceptions;
+using OnlineAuctionWeb.Application.Exceptions;
 using System.Security.Claims;
 
 namespace OnlineAuctionWeb.Infrastructure.Authorize
