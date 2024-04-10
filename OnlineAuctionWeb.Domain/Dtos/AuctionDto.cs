@@ -22,7 +22,7 @@ namespace OnlineAuctionWeb.Domain.Dtos
         public int BidCount { get; set; }
         public ProductStatusEnum ProductStatus { get; set; }
         public Int32 ViewCount { get; set; }
-        public UserDto Seller { get; set; }
+        public UserDto User { get; set; }
         public string CategoryName { get; set; }
     }
 }

@@ -29,6 +29,15 @@
         PendingPublish = 5
     }
 
+    public enum WatchListTypeEnum
+    {
+        RecenttlyViewed = 1,
+        WatchList = 2,
+        Bidding = 3,
+        Won = 4,
+        Lost = 5
+    }
+
     public enum VnpayResponseCode
     {
         // VNPAY phản hồi qua IPN và Return URL

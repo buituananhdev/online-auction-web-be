@@ -1,16 +1,16 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using OnlineAuctionWeb.Application.Exceptions;
 using OnlineAuctionWeb.Domain;
 using OnlineAuctionWeb.Domain.Dtos;
 using OnlineAuctionWeb.Domain.Enums;
 using OnlineAuctionWeb.Domain.Models;
 using OnlineAuctionWeb.Domain.Payloads;
-using OnlineAuctionWeb.Infrastructure.Exceptions;
 using System.Text.Json;
-using System.Text.RegularExpressions;
 
-namespace OnlineAuctionWeb.Application
+namespace OnlineAuctionWeb.Application.Services
 {
     public interface IAuctionService
     {
@@ -27,24 +27,29 @@ namespace OnlineAuctionWeb.Application
             DateTime? maxEndTime = null,
             string? categoryIds = null);
         Task<AuctionDto> GetByIdAsync(int id);
-        Task CreateAsync(CreateAuctionDto productDto, int userId);
+        Task CreateAsync(CreateAuctionDto productDto);
         Task<AuctionDto> UpdateAsync(int id, AuctionDto productDto);
         Task<AuctionDto> DeleteAsync(int id);
         Task ChangeStatusAsync(int id, ProductStatusEnum status);
         Task UpdateCurrentPriceAsync(int id, decimal price);
         Task UpdateProductStatusAsync(int id, ProductStatusEnum status);
         Task SeedData(int count);
+        Task<List<AuctionDto>> GetListRecentlyViewedAsync();
+        Task<List<AuctionDto>> GetTop10Auctions();
     }
     public class AuctionService : IAuctionService
     {
         private readonly DataContext _context;
         private readonly IMapper _mapper;
         private readonly IFeedbackService _feedbackService;
-        public AuctionService(DataContext context, IMapper mapper, IFeedbackService feedbackService)
+        private readonly ICurrentUserService _currentUserService;
+
+        public AuctionService(DataContext context, IMapper mapper, IFeedbackService feedbackService, ICurrentUserService currentUserService)
         {
             _context = context;
             _mapper = mapper;
             _feedbackService = feedbackService;
+            _currentUserService = currentUserService;
         }
 
         public async Task ChangeStatusAsync(int id, ProductStatusEnum status)
@@ -52,7 +57,7 @@ namespace OnlineAuctionWeb.Application
             try
             {
                 var auction = await _context.Auctions.FindAsync(id);
-                if(auction is null)
+                if (auction is null)
                 {
                     throw new CustomException(StatusCodes.Status404NotFound, "Auction not found!");
                 }
@@ -67,12 +72,17 @@ namespace OnlineAuctionWeb.Application
             }
         }
 
-        public async Task CreateAsync(CreateAuctionDto auctionDto, int userId)
+        public async Task CreateAsync(CreateAuctionDto auctionDto)
         {
             try
             {
+                if(_currentUserService.UserId == null)
+                {
+                    throw new CustomException(StatusCodes.Status401Unauthorized, "Invalid token!");
+                } 
+
                 var auction = _mapper.Map<Auction>(auctionDto);
-                auction.SellerId = userId;
+                auction.UserId = (int)_currentUserService.UserId;
                 auction.CurrentPrice = auction.StartingPrice;
                 _context.Auctions.Add(auction);
                 await _context.SaveChangesAsync();
@@ -126,7 +136,7 @@ namespace OnlineAuctionWeb.Application
             {
                 var query = _context.Auctions
                     .Include(a => a.Bids) // Include bids related to auction
-                    .Include(a => a.Seller) // Include seller information
+                    .Include(a => a.User) // Include seller information
                     .Include(a => a.Category) // Include category information
                     .AsQueryable();
 
@@ -197,8 +207,8 @@ namespace OnlineAuctionWeb.Application
                 {
                     var auctionDto = _mapper.Map<AuctionDto>(auction);
                     auctionDto.BidCount = auction.Bids.Count();
-                    auctionDto.Seller = _mapper.Map<UserDto>(auction.Seller);
-                    auctionDto.Seller.ratings = _feedbackService.GetAverageRatingByUserId(auction.SellerId);
+                    auctionDto.User = _mapper.Map<UserDto>(auction.User);
+                    auctionDto.User.ratings = _feedbackService.GetAverageRatingByUserId(auction.UserId);
                     auctionDto.CategoryName = auction.Category.CategoryName;
                     auctionDtos.Add(auctionDto);
                 }
@@ -235,6 +245,49 @@ namespace OnlineAuctionWeb.Application
             return _mapper.Map<AuctionDto>(auction);
         }
 
+        public async Task<List<AuctionDto>> GetListRecentlyViewedAsync()
+        {
+            try
+            {
+                if(_currentUserService.UserId == null)
+                {
+                    throw new CustomException(StatusCodes.Status401Unauthorized, "Invalid token!");
+                }
+
+                var auctions = await _context.WatchList
+                .Where(wl => wl.UserId == _currentUserService.UserId && wl.Type == WatchListTypeEnum.RecenttlyViewed)
+                .Select(wl => wl.Auction)
+                .Include(a => a.User)
+                .Include(a => a.Category)
+                .ToListAsync();
+
+                return _mapper.Map<List<AuctionDto>>(auctions);
+            } catch (Exception ex)
+            {
+                Console.WriteLine("Err", ex.Message);
+                throw;
+            }
+        }
+
+        public async Task<List<AuctionDto>> GetTop10Auctions()
+        {
+            try
+            {
+                var topAuctions = await _context.Auctions
+                .Where(a => a.EndTime > DateTime.Now && a.Bids.Any())
+                .OrderByDescending(a => a.Bids.Count)
+                .Take(10)
+                .ToListAsync();
+
+                return _mapper.Map<List<AuctionDto>>(topAuctions);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                throw;
+            }
+        }
+
         public async Task SeedData(int count)
         {
             var random = new Random();
@@ -253,7 +306,7 @@ namespace OnlineAuctionWeb.Application
                     CanReturn = random.Next(0, 2) == 1,
                     ProductStatus = (ProductStatusEnum)random.Next(0, 3), // Assume ProductStatusEnum has 3 values
                     ViewCount = random.Next(0, 1000),
-                    SellerId = 17, // SellerId is 22 as specified
+                    UserId = 17, // SellerId is 22 as specified
                     CategoryId = random.Next(3, 4) // Assuming you have 10 categories
                 };
 

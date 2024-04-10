@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace OnlineAuctionWeb.Application
+namespace OnlineAuctionWeb.Application.Services
 {
     public interface IFeedbackService
     {

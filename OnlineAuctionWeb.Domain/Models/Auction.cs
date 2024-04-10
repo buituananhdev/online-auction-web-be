@@ -15,8 +15,8 @@ namespace OnlineAuctionWeb.Domain.Models
         public Boolean CanReturn { get; set; }
         public ProductStatusEnum ProductStatus { get; set; }
         public Int32 ViewCount { get; set; }
-        public int SellerId { get; set; }
-        public User Seller { get; set; }
+        public int UserId { get; set; }
+        public User User { get; set; }
         public int CategoryId { get; set; }
         public Category Category { get; set; }
         public List<AuctionMedia> ProductMedias { get; set; }

@@ -6,9 +6,9 @@ using OnlineAuctionWeb.Domain.Dtos;
 using OnlineAuctionWeb.Domain.Enums;
 using OnlineAuctionWeb.Domain.Models;
 using OnlineAuctionWeb.Domain.Payloads;
-using OnlineAuctionWeb.Infrastructure.Exceptions;
+using OnlineAuctionWeb.Application.Exceptions;
 
-namespace OnlineAuctionWeb.Application
+namespace OnlineAuctionWeb.Application.Services
 {
     public interface IUserService
     {

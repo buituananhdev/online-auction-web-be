@@ -16,6 +16,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\OnlineAuctionWeb.Application\OnlineAuctionWeb.Application.csproj" />
     <ProjectReference Include="..\OnlineAuctionWeb.Domain\OnlineAuctionWeb.Domain.csproj" />
   </ItemGroup>
 

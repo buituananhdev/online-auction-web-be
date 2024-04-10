@@ -5,7 +5,7 @@ using OnlineAuctionWeb.Infrastructure.Utils;
 using OnlineAuctionWeb.Domain.Dtos;
 using OnlineAuctionWeb.Domain.Enums;
 using OnlineAuctionWeb.Domain.Payloads;
-using OnlineAuctionWeb.Infrastructure.Exceptions;
+using OnlineAuctionWeb.Application.Exceptions;
 using System.IdentityModel.Tokens.Jwt;
 using Newtonsoft.Json.Linq;
 using System.Security.Claims;
@@ -13,7 +13,7 @@ using OnlineAuctionWeb.Domain;
 using Microsoft.EntityFrameworkCore;
 using OnlineAuctionWeb.Domain.Models;
 
-namespace OnlineAuctionWeb.Application
+namespace OnlineAuctionWeb.Application.Services
 {
     public interface IAuthService
     {
@@ -41,7 +41,7 @@ namespace OnlineAuctionWeb.Application
             JwtSecurityToken jwtTokenObject = tokenHandler.ReadJwtToken(googleToken);
             string email = jwtTokenObject.Claims.First(claim => claim.Type == "email").Value;
 
-            var existingUser =  _userService.FindUserByEmailAsync(email);
+            var existingUser = _userService.FindUserByEmailAsync(email);
             if (existingUser == null)
             {
                 if (role == RoleEnum.Admin || !Enum.IsDefined(typeof(RoleEnum), role))
@@ -59,7 +59,7 @@ namespace OnlineAuctionWeb.Application
                     Status = StatusEnum.Active
                 };
 
-                existingUser = await _userService.CreateGoogleUserAsync(_mapper.Map<CreateUserDto>(user));   
+                existingUser = await _userService.CreateGoogleUserAsync(_mapper.Map<CreateUserDto>(user));
             }
 
             var tokenPayload = JwtUtil.GenerateAccessToken(_mapper.Map<UserDto>(existingUser), _configuration);
@@ -71,8 +71,8 @@ namespace OnlineAuctionWeb.Application
         {
             try
             {
-                var user =  _userService.FindUserByEmailAsync(loginDto.Email);
-                if(user == null)
+                var user = _userService.FindUserByEmailAsync(loginDto.Email);
+                if (user == null)
                 {
                     throw new CustomException(StatusCodes.Status404NotFound, "User not found!");
                 }
