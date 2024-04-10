@@ -31,7 +31,7 @@
 
     public enum WatchListTypeEnum
     {
-        RecenttlyViewed = 1,
+        RecentlyViewed = 1,
         WatchList = 2,
         Bidding = 3,
         Won = 4,

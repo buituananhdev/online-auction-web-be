@@ -77,8 +77,8 @@ namespace OnlineAuctionWeb.Api.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateAsync(CreateAuctionDto auctionDto)
         {
-            await _auctionService.CreateAsync(auctionDto);
-            return StatusCode(201);
+            var result = await _auctionService.CreateAsync(auctionDto);
+            return Ok(result);
         }
 
         /// <summary>

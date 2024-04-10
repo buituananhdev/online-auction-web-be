@@ -12,7 +12,7 @@ namespace OnlineAuctionWeb.Application.Services
     public interface IBidService
     {
         Task<PaginatedResult<BidDto>> GetAllAsync(int pageNumber, int pageSize);
-        Task CreateAsync(CreateBidDto bidDto, string userId);
+        Task CreateAsync(CreateBidDto bidDto);
     }
 
     public class BidService : IBidService
@@ -20,23 +20,29 @@ namespace OnlineAuctionWeb.Application.Services
         private readonly DataContext _context;
         private readonly IMapper _mapper;
         private readonly IAuctionService _auctionService;
+        private readonly ICurrentUserService _currentUserService;
         private readonly ProductStatusEnum[] INVALID_AUCTION_STATUSES = new[]
         {
             ProductStatusEnum.Canceled, ProductStatusEnum.Ended, ProductStatusEnum.PendingPublish
         };
 
-        public BidService(DataContext context, IMapper mapper, IAuctionService auctionService)
+        public BidService(DataContext context, IMapper mapper, IAuctionService auctionService, ICurrentUserService currentUserService)
         {
             _context = context;
             _mapper = mapper;
             _auctionService = auctionService;
+            _currentUserService = currentUserService;
         }
 
-        public async Task CreateAsync(CreateBidDto bidDto, string userId)
+        public async Task CreateAsync(CreateBidDto bidDto)
         {
             try
             {
-                bidDto.UserId = int.Parse(userId);
+                if(_currentUserService.UserId == null)
+                {
+                      throw new CustomException(StatusCodes.Status401Unauthorized, "Invalid token!");
+                }
+
                 var auction = await _auctionService.GetByIdAsync(bidDto.AuctionId);
                 if (bidDto.BidAmount <= auction.CurrentPrice || bidDto.BidAmount > auction.MaxPrice)
                 {
@@ -54,7 +60,10 @@ namespace OnlineAuctionWeb.Application.Services
                     await _auctionService.UpdateProductStatusAsync(auction.Id, ProductStatusEnum.Ended);
                 }
 
-                await _context.Bids.AddAsync(_mapper.Map<Domain.Models.Bid>(bidDto));
+                var user = _mapper.Map<Domain.Models.Bid>(bidDto);
+                user.UserId = _currentUserService.UserId;
+
+                await _context.Bids.AddAsync(user);
                 await _auctionService.UpdateCurrentPriceAsync(bidDto.AuctionId, bidDto.BidAmount);
             }
             catch (Exception ex)
