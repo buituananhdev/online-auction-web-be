@@ -15,7 +15,7 @@ namespace OnlineAuctionWeb.Infrastructure.Hubs
         private readonly IHubContext<AuctionHub> _hubContext;
         private readonly IWatchListService _watchListService;
         private readonly ICurrentUserService _currentUserService;
-        public static readonly ConcurrentDictionary<int, HubUser> Users = new();
+        public static readonly ConcurrentDictionary<int?, HubUser> Users = new();
 
         public AuctionHub(IWatchListService watchListService, IHubContext<AuctionHub> hubContext)
         {
@@ -33,7 +33,7 @@ namespace OnlineAuctionWeb.Infrastructure.Hubs
                 }
 
                 Console.WriteLine("User connected");
-                int userId = _currentUserService.UserId;
+                int userId = (int)_currentUserService.UserId;
                 var watchList = await _watchListService.GetListAuctionIdsByUserIDAsync(userId);
 
                 var userConnection = Users.GetOrAdd(
@@ -85,7 +85,7 @@ namespace OnlineAuctionWeb.Infrastructure.Hubs
                     userConnection.ConnectionIds.Remove(connectionId);
                 }
 
-                var watchList = await _watchListService.GetListAuctionIdsByUserIDAsync(userId);
+                var watchList = await _watchListService.GetListAuctionIdsByUserIDAsync((int)userId);
                 foreach (var auctionId in watchList)
                 {
                     await Groups.RemoveFromGroupAsync(connectionId, auctionId.ToString());

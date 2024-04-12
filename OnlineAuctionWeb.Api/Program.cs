@@ -2,7 +2,7 @@
 using Microsoft.OpenApi.Models;
 using OnlineAuctionWeb.Application;
 using OnlineAuctionWeb.Domain;
-using OnlineAuctionWeb.Domain.Mappings;
+using OnlineAuctionWeb.Application.Mappings;
 using OnlineAuctionWeb.Infrastructure.Middleware;
 using OnlineAuctionWeb.Infrastructure;
 using OnlineAuctionWeb.Infrastructure.Hubs;

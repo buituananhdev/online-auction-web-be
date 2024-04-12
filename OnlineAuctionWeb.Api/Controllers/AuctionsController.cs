@@ -64,8 +64,7 @@ namespace OnlineAuctionWeb.Api.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> GetByIdAsync(int id)
         {
-            var result = await _auctionService.GetByIdAsync(id);
-            await _hubContext.Clients.All.SendAsync("UserJoinAuctionAsync", id);
+            var result = await _auctionService.GetDetailsAsync(id);
             return Ok(result);
         }
 

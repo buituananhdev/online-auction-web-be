@@ -61,7 +61,7 @@ namespace OnlineAuctionWeb.Application.Services
                 }
 
                 var user = _mapper.Map<Domain.Models.Bid>(bidDto);
-                user.UserId = _currentUserService.UserId;
+                user.UserId = (int)_currentUserService.UserId;
 
                 await _context.Bids.AddAsync(user);
                 await _auctionService.UpdateCurrentPriceAsync(bidDto.AuctionId, bidDto.BidAmount);
