@@ -1,7 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using OnlineAuctionWeb.Application.Exceptions;
 using OnlineAuctionWeb.Domain;
 using OnlineAuctionWeb.Domain.Dtos;
@@ -79,7 +78,7 @@ namespace OnlineAuctionWeb.Application.Services
         {
             try
             {
-                if(_currentUserService.UserId == null)
+                if (_currentUserService.UserId == null)
                 {
                     throw new CustomException(StatusCodes.Status401Unauthorized, "Invalid token!");
                 }
@@ -90,7 +89,7 @@ namespace OnlineAuctionWeb.Application.Services
                 _context.Auctions.Add(auction);
                 await _context.SaveChangesAsync();
 
-                return _mapper.Map<AuctionDto>(auction); 
+                return _mapper.Map<AuctionDto>(auction);
             }
             catch (Exception ex)
             {
@@ -260,7 +259,7 @@ namespace OnlineAuctionWeb.Application.Services
                 .Include(a => a.User)
                 .AsQueryable()
                 .FirstOrDefaultAsync(a => a.Id == id);
-            
+
             if (auction == null)
             {
                 throw new CustomException(StatusCodes.Status404NotFound, "Auction not found!");
@@ -291,7 +290,8 @@ namespace OnlineAuctionWeb.Application.Services
                 .ToListAsync();
 
                 return _mapper.Map<List<AuctionDto>>(auctions);
-            } catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 Console.WriteLine("Err", ex.Message);
                 throw;
@@ -303,28 +303,26 @@ namespace OnlineAuctionWeb.Application.Services
             try
             {
                 var topAuctions = await _context.Auctions
-                .Where(a => a.EndTime > DateTime.Now && a.Bids.Any())
-                .OrderByDescending(a => a.Bids.Count)
-                .Take(10)
-                .Select(a => new AuctionDto
-                {
-                    Id = a.Id,
-                    ProductName = a.ProductName,
-                    Description = a.Description,
-                    Condition = a.Condition,
-                    StartingPrice = a.StartingPrice,
-                    MaxPrice = a.MaxPrice,
-                    CurrentPrice = a.CurrentPrice,
-                    EndTime = a.EndTime,
-                    BidCount = a.Bids.Count,
-                    ProductStatus = a.ProductStatus,
-                    ViewCount = a.ViewCount,
-                    User = _mapper.Map<UserDto>(a.User),
-                    CategoryName = a.Category.CategoryName
-                })
-                .ToListAsync();
+                    .Include(a => a.Bids)
+                    .Include(a => a.User)
+                    .Include(a => a.Category)
+                    .Where(a => a.EndTime > DateTime.Now && a.Bids.Any())
+                    .OrderByDescending(a => a.Bids.Count)
+                    .Take(10)
+                    .ToListAsync();
 
-                return topAuctions;
+                var auctionDtos = new List<AuctionDto>();
+                foreach (var auction in topAuctions)
+                {
+                    var auctionDto = _mapper.Map<AuctionDto>(auction);
+                    auctionDto.BidCount = auction.Bids.Count();
+                    auctionDto.User = _mapper.Map<UserDto>(auction.User);
+                    auctionDto.User.ratings = _feedbackService.GetAverageRatingByUserId(auction.UserId);
+                    auctionDto.CategoryName = auction.Category.CategoryName;
+                    auctionDtos.Add(auctionDto);
+                }
+
+                return auctionDtos;
             }
             catch (Exception ex)
             {
