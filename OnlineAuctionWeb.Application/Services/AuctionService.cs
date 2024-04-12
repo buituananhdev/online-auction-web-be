@@ -239,7 +239,11 @@ namespace OnlineAuctionWeb.Application.Services
 
         public async Task<AuctionDto> GetByIdAsync(int id)
         {
-            var auction = await _context.Auctions.Include(a => a.Bids).AsQueryable().FirstOrDefaultAsync(a => a.Id == id);
+            var auction = await _context.Auctions
+                .Include(a => a.Bids)
+                .Include(a => a.User)
+                .AsQueryable()
+                .FirstOrDefaultAsync(a => a.Id == id);
             if (auction == null)
             {
                 throw new CustomException(StatusCodes.Status404NotFound, "Auction not found!");
