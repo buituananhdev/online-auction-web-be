@@ -84,7 +84,7 @@ namespace OnlineAuctionWeb.Application.Services
                 }
 
                 var auction = _mapper.Map<Auction>(auctionDto);
-                auction.UserId = _currentUserService.UserId;
+                auction.UserId = (int)_currentUserService.UserId;
                 auction.CurrentPrice = auction.StartingPrice;
                 _context.Auctions.Add(auction);
                 await _context.SaveChangesAsync();
@@ -269,8 +269,13 @@ namespace OnlineAuctionWeb.Application.Services
             await _context.SaveChangesAsync();
             var auctionDto = _mapper.Map<AuctionDto>(auction);
             auctionDto.BidCount = auction.Bids.Count();
+            auctionDto.User.ratings = _feedbackService.GetAverageRatingByUserId(auction.UserId);
 
-            await _watchListService.AddToWatchListAsync(new CreateWatchListDto(_currentUserService.UserId, id, WatchListTypeEnum.RecentlyViewed));
+            if(_currentUserService.UserId != null)
+            {
+                await _watchListService.AddToWatchListAsync(new CreateWatchListDto((int)_currentUserService.UserId, id, WatchListTypeEnum.RecentlyViewed));
+            }
+
             return auctionDto;
         }
 

@@ -5,10 +5,11 @@ namespace OnlineAuctionWeb.Application.Services
 {
     public interface ICurrentUserService
     {
-        public int UserId { get; }
+        public int? UserId { get; }
         public string Email { get; }
         public string Role { get; }
     }
+
     public class CurrentUserService : ICurrentUserService
     {
         private readonly IHttpContextAccessor _httpContextAccessor;
@@ -17,7 +18,19 @@ namespace OnlineAuctionWeb.Application.Services
         {
             _httpContextAccessor = httpContextAccessor;
         }
-        public int UserId => int.Parse(_httpContextAccessor.HttpContext?.User?.FindFirstValue("ID"));
+
+        public int? UserId
+        {
+            get
+            {
+                var userIdClaim = _httpContextAccessor.HttpContext?.User?.FindFirst("ID")?.Value;
+                if (int.TryParse(userIdClaim, out int userId))
+                {
+                    return userId;
+                }
+                return null;
+            }
+        }
 
         public string Email => _httpContextAccessor.HttpContext?.User?.FindFirstValue(ClaimTypes.Email);
 
