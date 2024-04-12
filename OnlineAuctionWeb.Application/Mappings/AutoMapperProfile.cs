@@ -29,6 +29,8 @@ namespace OnlineAuctionWeb.Application.Mappings
 
             // WatchList profile
             CreateMap<WatchList, CreateWatchListDto>().ReverseMap();
+            CreateMap<CreateWatchListDto, WatchList>().ReverseMap();
+
         }
     }
 }

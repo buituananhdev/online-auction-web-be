@@ -27,6 +27,7 @@ namespace OnlineAuctionWeb.Application.Services
             DateTime? maxEndTime = null,
             string? categoryIds = null);
         Task<AuctionDto> GetByIdAsync(int id);
+        Task<AuctionDto> GetDetailsAsync(int id);
         Task<AuctionDto> CreateAsync(CreateAuctionDto productDto);
         Task<AuctionDto> UpdateAsync(int id, AuctionDto productDto);
         Task<AuctionDto> DeleteAsync(int id);
@@ -43,13 +44,15 @@ namespace OnlineAuctionWeb.Application.Services
         private readonly IMapper _mapper;
         private readonly IFeedbackService _feedbackService;
         private readonly ICurrentUserService _currentUserService;
+        private readonly IWatchListService _watchListService;
 
-        public AuctionService(DataContext context, IMapper mapper, IFeedbackService feedbackService, ICurrentUserService currentUserService)
+        public AuctionService(DataContext context, IMapper mapper, IFeedbackService feedbackService, ICurrentUserService currentUserService, IWatchListService watchListService)
         {
             _context = context;
             _mapper = mapper;
             _feedbackService = feedbackService;
             _currentUserService = currentUserService;
+            _watchListService = watchListService;
         }
 
         public async Task ChangeStatusAsync(int id, ProductStatusEnum status)
@@ -239,11 +242,7 @@ namespace OnlineAuctionWeb.Application.Services
 
         public async Task<AuctionDto> GetByIdAsync(int id)
         {
-            var auction = await _context.Auctions
-                .Include(a => a.Bids)
-                .Include(a => a.User)
-                .AsQueryable()
-                .FirstOrDefaultAsync(a => a.Id == id);
+            var auction = await _context.Auctions.FindAsync(id);
             if (auction == null)
             {
                 throw new CustomException(StatusCodes.Status404NotFound, "Auction not found!");
@@ -251,6 +250,28 @@ namespace OnlineAuctionWeb.Application.Services
 
             var auctionDto = _mapper.Map<AuctionDto>(auction);
             auctionDto.BidCount = auction.Bids.Count();
+            return auctionDto;
+        }
+
+        public async Task<AuctionDto> GetDetailsAsync(int id)
+        {
+            var auction = await _context.Auctions
+                .Include(a => a.Bids)
+                .Include(a => a.User)
+                .AsQueryable()
+                .FirstOrDefaultAsync(a => a.Id == id);
+            
+            if (auction == null)
+            {
+                throw new CustomException(StatusCodes.Status404NotFound, "Auction not found!");
+            }
+
+            auction.ViewCount = auction.ViewCount++;
+            await _context.SaveChangesAsync();
+            var auctionDto = _mapper.Map<AuctionDto>(auction);
+            auctionDto.BidCount = auction.Bids.Count();
+
+            await _watchListService.AddToWatchListAsync(new CreateWatchListDto(_currentUserService.UserId, id, WatchListTypeEnum.RecentlyViewed));
             return auctionDto;
         }
 
