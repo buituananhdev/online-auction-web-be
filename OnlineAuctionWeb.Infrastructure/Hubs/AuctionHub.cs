@@ -7,7 +7,7 @@ using System.Collections.Concurrent;
 
 namespace OnlineAuctionWeb.Infrastructure.Hubs
 {
-    public class AuctionHub : Hub
+    public sealed class AuctionHub : Hub
     {
         public const string USER_JOIN_AUCTION = "USER_JOIN_AUCTION";
         public const string USER_LEAVE_AUCTION = "USER_LEAVE_AUCTION";

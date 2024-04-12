@@ -239,7 +239,7 @@ namespace OnlineAuctionWeb.Application.Services
 
         public async Task<AuctionDto> GetByIdAsync(int id)
         {
-            var auction = await _context.Auctions.FindAsync(id);
+            var auction = await _context.Auctions.Include(a => a.Bids).AsQueryable().FirstOrDefaultAsync(a => a.Id == id);
             if (auction == null)
             {
                 throw new CustomException(StatusCodes.Status404NotFound, "Auction not found!");
@@ -254,16 +254,15 @@ namespace OnlineAuctionWeb.Application.Services
         {
             try
             {
-                if(_currentUserService.UserId == null)
+                if (_currentUserService.UserId == null)
                 {
                     throw new CustomException(StatusCodes.Status401Unauthorized, "Invalid token!");
                 }
 
                 var auctions = await _context.WatchList
                 .Where(wl => wl.UserId == _currentUserService.UserId && wl.Type == WatchListTypeEnum.RecentlyViewed)
+                .Include(a => a.Auction)
                 .Select(wl => wl.Auction)
-                .Include(a => a.User)
-                .Include(a => a.Category)
                 .ToListAsync();
 
                 return _mapper.Map<List<AuctionDto>>(auctions);
