@@ -19,8 +19,8 @@ namespace OnlineAuctionWeb.Application.Services
         }
         public int UserId => int.Parse(_httpContextAccessor.HttpContext?.User?.FindFirstValue("ID"));
 
-        public string? Email => _httpContextAccessor.HttpContext?.User?.FindFirstValue(ClaimTypes.Email);
+        public string Email => _httpContextAccessor.HttpContext?.User?.FindFirstValue(ClaimTypes.Email);
 
-        public string? Role => _httpContextAccessor.HttpContext?.User?.FindFirstValue(ClaimTypes.Role);
+        public string Role => _httpContextAccessor.HttpContext?.User?.FindFirstValue(ClaimTypes.Role);
     }
 }
