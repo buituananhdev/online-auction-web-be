@@ -36,6 +36,8 @@ namespace OnlineAuctionWeb.Application.Services
         Task SeedData(int count);
         Task<List<AuctionDto>> GetListRecentlyViewedAsync();
         Task<List<AuctionDto>> GetTop10Auctions();
+        Task<List<AuctionDto>> GetSellerAuctionsHistory();
+
     }
     public class AuctionService : IAuctionService
     {
@@ -302,6 +304,32 @@ namespace OnlineAuctionWeb.Application.Services
                 throw;
             }
         }
+
+        public async Task<List<AuctionDto>> GetSellerAuctionsHistory()
+        {
+            try
+            {
+                if (_currentUserService.UserId == null)
+                {
+                    throw new CustomException(StatusCodes.Status401Unauthorized, "Invalid token!");
+                }
+
+                int userId = (int)_currentUserService.UserId;
+
+                var auctions = await _context.Auctions
+                    .Where(a => a.UserId == userId)
+                    .ToListAsync();
+
+
+                return _mapper.Map<List<AuctionDto>>(auctions);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                throw;
+            }
+        }
+
 
         public async Task<List<AuctionDto>> GetTop10Auctions()
         {
