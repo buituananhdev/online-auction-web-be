@@ -2,6 +2,8 @@
 using Microsoft.AspNetCore.Mvc;
 using OnlineAuctionWeb.Application.Services;
 using OnlineAuctionWeb.Domain.Dtos;
+using OnlineAuctionWeb.Domain.Enums;
+using OnlineAuctionWeb.Infrastructure.Authorize;
 
 namespace OnlineAuctionWeb.Api.Controllers
 {
@@ -27,6 +29,7 @@ namespace OnlineAuctionWeb.Api.Controllers
         /// <returns>List of bids.</returns>
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
+        [RolesAuthorize(RequiredRoles = new RoleEnum[] { RoleEnum.Admin })]
         public async Task<IActionResult> GetBids([FromQuery] int page = 1, [FromQuery] int pageSize = 10)
         {
             var bids = await _bidService.GetAllAsync(page, pageSize);
@@ -41,6 +44,7 @@ namespace OnlineAuctionWeb.Api.Controllers
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [RolesAuthorize(RequiredRoles = new RoleEnum[] { RoleEnum.Seller })]
         public async Task<IActionResult> CreateBid([FromBody] CreateBidDto bidDto)
         {
             await _bidService.CreateAsync(bidDto);

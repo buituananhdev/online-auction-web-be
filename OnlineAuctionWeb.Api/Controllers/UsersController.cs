@@ -33,7 +33,7 @@ namespace OnlineAuctionWeb.Api.Controllers
         /// <param name="status">Optional status filter to filter users by their status.</param>
         /// <returns>Returns a paginated list of users.</returns>
         [HttpGet]
-        //[RolesAuthorize(RequiredRoles = new RoleEnum[] { RoleEnum.Admin })]
+        [RolesAuthorize(RequiredRoles = new RoleEnum[] { RoleEnum.Admin })]
         public async Task<IActionResult> GetUsers(
             [FromQuery] int page = 1, 
             [FromQuery] int pageSize = 10, 
@@ -63,7 +63,7 @@ namespace OnlineAuctionWeb.Api.Controllers
         /// <param name="userDto">The data for creating the new user.</param>
         /// <returns>Returns the created user.</returns>
         [HttpPost]
-        //[RolesAuthorize(RequiredRoles = new RoleEnum[] { RoleEnum.Admin })]
+        [RolesAuthorize(RequiredRoles = new RoleEnum[] { RoleEnum.Admin })]
         public async Task<IActionResult> CreateUser([FromBody] CreateUserDto userDto)
         {
             await _userService.CreateAsync(userDto);

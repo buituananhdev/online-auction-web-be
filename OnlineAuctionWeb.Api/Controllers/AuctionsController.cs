@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.SignalR;
 using OnlineAuctionWeb.Application.Services;
 using OnlineAuctionWeb.Domain.Dtos;
 using OnlineAuctionWeb.Domain.Enums;
+using OnlineAuctionWeb.Infrastructure.Authorize;
 using OnlineAuctionWeb.Infrastructure.Hubs;
 using System;
 using System.Linq;
@@ -74,6 +75,7 @@ namespace OnlineAuctionWeb.Api.Controllers
         /// <param name="auctionDto">The data for creating the auction.</param>
         /// <returns>Returns the status code indicating success.</returns>
         [HttpPost]
+        [RolesAuthorize(RequiredRoles = new RoleEnum[] { RoleEnum.Seller })]
         public async Task<IActionResult> CreateAsync(CreateAuctionDto auctionDto)
         {
             var result = await _auctionService.CreateAsync(auctionDto);
@@ -87,6 +89,7 @@ namespace OnlineAuctionWeb.Api.Controllers
         /// <param name="auctionDto">The updated data for the auction.</param>
         /// <returns>Returns the updated auction.</returns>
         [HttpPut("{id}")]
+        [RolesAuthorize(RequiredRoles = new RoleEnum[] { RoleEnum.Seller })]
         public async Task<IActionResult> UpdateAsync(int id, AuctionDto auctionDto)
         {
             var result = await _auctionService.UpdateAsync(id, auctionDto);
@@ -99,6 +102,7 @@ namespace OnlineAuctionWeb.Api.Controllers
         /// <param name="id">The unique identifier of the auction to delete.</param>
         /// <returns>Returns the status code indicating success.</returns>
         [HttpDelete("{id}")]
+        [RolesAuthorize(RequiredRoles = new RoleEnum[] { RoleEnum.Seller, RoleEnum.Admin })]
         public async Task<IActionResult> DeleteAsync(int id)
         {
             var result = await _auctionService.DeleteAsync(id);
@@ -111,6 +115,7 @@ namespace OnlineAuctionWeb.Api.Controllers
         /// <param name="id">The unique identifier of the auction to cancel.</param>
         /// <param name="status">The new status to be assigned to the auction.</param>
         /// <returns>Returns the status code indicating success.</returns>
+        [RolesAuthorize(RequiredRoles = new RoleEnum[] { RoleEnum.Seller, RoleEnum.Admin })]
         [HttpPatch("{id}/cancel")]
         public async Task<IActionResult> ChangeStatusAsync(int id, ProductStatusEnum status)
         {
@@ -123,6 +128,7 @@ namespace OnlineAuctionWeb.Api.Controllers
         /// </summary>
         /// <param name="count">The number of auctions to seed.</param>
         /// <returns>Returns the status code indicating success.</returns>
+        [RolesAuthorize(RequiredRoles = new RoleEnum[] { RoleEnum.Admin })]
         [HttpPost("seed")]
         public async Task<IActionResult> SeedAuctions(int count)
         {
@@ -134,6 +140,7 @@ namespace OnlineAuctionWeb.Api.Controllers
         /// Retrieves the list of recently viewed auctions.
         /// </summary>
         /// <returns>Returns the list of recently viewed auctions.</returns>
+        [RolesAuthorize(RequiredRoles = new RoleEnum[] { RoleEnum.Buyer })]
         [HttpGet("recently-viewed")]
         public async Task<IActionResult> GetRecentlyViewed()
         {
