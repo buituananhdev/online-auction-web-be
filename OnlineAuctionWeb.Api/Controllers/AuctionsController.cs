@@ -158,5 +158,31 @@ namespace OnlineAuctionWeb.Api.Controllers
             var result = await _auctionService.GetTop10Auctions();
             return Ok(result);
         }
+
+
+        /// <summary>
+        /// Retrieves the auction history for the seller.
+        /// </summary>
+        /// <returns>Returns the auction history for the seller.</returns>
+        [HttpGet("seller-history")]
+        [RolesAuthorize(RequiredRoles = new RoleEnum[] { RoleEnum.Seller })]
+        public async Task<IActionResult> GetSellerAuctionsHistory()
+        {
+            var result = await _auctionService.GetSellerAuctionsHistory();
+            return Ok(result);
+        }
+
+
+        /// <summary>
+        /// Retrieves the auction history for the buyer.
+        /// </summary>
+        /// <returns>Returns the auction history for the buyer.</returns>
+        [HttpGet("buyer-history")]
+        [RolesAuthorize(RequiredRoles = new RoleEnum[] { RoleEnum.Buyer })]
+        public async Task<IActionResult> GetBuyerAuctionsHistory()
+        {
+            var result = await _auctionService.GetBuyerAuctionsHistory();
+            return Ok(result);
+        }
     }
 }
