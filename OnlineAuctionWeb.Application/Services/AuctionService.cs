@@ -66,6 +66,11 @@ namespace OnlineAuctionWeb.Application.Services
                     throw new CustomException(StatusCodes.Status404NotFound, "Auction not found!");
                 }
 
+                if(auction.UserId != _currentUserService.UserId || _currentUserService.Role != "Admin")
+                {
+                    throw new CustomException(StatusCodes.Status401Unauthorized, "You are not authorized to change the status of this auction!");
+                }
+
                 auction.ProductStatus = status;
                 await _context.SaveChangesAsync();
             }
@@ -290,13 +295,27 @@ namespace OnlineAuctionWeb.Application.Services
                     throw new CustomException(StatusCodes.Status401Unauthorized, "Invalid token!");
                 }
 
-                var auctions = await _context.WatchList
-                .Where(wl => wl.UserId == _currentUserService.UserId && wl.Type == WatchListTypeEnum.RecentlyViewed)
-                .Include(a => a.Auction)
-                .Select(wl => wl.Auction)
-                .ToListAsync();
+                var query = _context.WatchList
+                    .Where(wl => wl.UserId == _currentUserService.UserId && wl.Type == WatchListTypeEnum.RecentlyViewed)
+                    .Join(_context.Auctions, wl => wl.AuctionId, a => a.Id, (wl, a) => a)
+                    .Include(a => a.Bids)
+                    .Include(a => a.Category)
+                    .Include(a => a.User)
+                    .AsQueryable();
 
-                return _mapper.Map<List<AuctionDto>>(auctions);
+                var auctions = await query.ToListAsync();
+
+                var auctionDtos = new List<AuctionDto>();
+                foreach (var auction in auctions)
+                {
+                    var auctionDto = _mapper.Map<AuctionDto>(auction);
+                    auctionDto.User = _mapper.Map<UserDto>(auction.User);
+                    auctionDto.User.ratings = _feedbackService.GetAverageRatingByUserId(auction.UserId);
+                    auctionDto.CategoryName = auction.Category.CategoryName;
+                    auctionDtos.Add(auctionDto);
+                }
+
+                return auctionDtos;
             }
             catch (Exception ex)
             {
@@ -319,7 +338,6 @@ namespace OnlineAuctionWeb.Application.Services
                 var auctions = await _context.Auctions
                     .Where(a => a.UserId == userId)
                     .ToListAsync();
-
 
                 return _mapper.Map<List<AuctionDto>>(auctions);
             }

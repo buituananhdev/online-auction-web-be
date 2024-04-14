@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using OnlineAuctionWeb.Application.Services;
 using OnlineAuctionWeb.Domain.Dtos;
 using OnlineAuctionWeb.Domain.Enums;
+using OnlineAuctionWeb.Infrastructure.Authorize;
 using System.Threading.Tasks;
 
 namespace OnlineAuctionWeb.Api.Controllers
@@ -31,6 +32,7 @@ namespace OnlineAuctionWeb.Api.Controllers
         /// <param name="categoryDto">The data for creating the category.</param>
         /// <returns>Returns the status code indicating success.</returns>
         [HttpPost]
+        [RolesAuthorize(RequiredRoles = new RoleEnum[] { RoleEnum.Admin })]
         [ProducesResponseType(StatusCodes.Status201Created)]
         public async Task<IActionResult> CreateAsync(CreateCategoryDto categoryDto)
         {
@@ -78,6 +80,7 @@ namespace OnlineAuctionWeb.Api.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [RolesAuthorize(RequiredRoles = new RoleEnum[] { RoleEnum.Admin })]
         public async Task<IActionResult> UpdateAsync(int id, UpdateCategoryDto categoryDto)
         {
             var result = await _categoryService.UpdateAsync(id, categoryDto);
@@ -94,6 +97,7 @@ namespace OnlineAuctionWeb.Api.Controllers
         [HttpDelete("{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [RolesAuthorize(RequiredRoles = new RoleEnum[] { RoleEnum.Admin })]
         public async Task<IActionResult> DeleteAsync(int id)
         {
             var result = await _categoryService.DeleteAsync(id);
@@ -117,6 +121,7 @@ namespace OnlineAuctionWeb.Api.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [RolesAuthorize(RequiredRoles = new RoleEnum[] { RoleEnum.Admin })]
         public async Task<IActionResult> ChangeStatusAsync(int id, StatusEnum status)
         {
             await _categoryService.ChangeStatusAsync(id, status);
