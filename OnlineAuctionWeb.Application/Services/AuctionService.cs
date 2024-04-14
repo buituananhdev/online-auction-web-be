@@ -37,7 +37,7 @@ namespace OnlineAuctionWeb.Application.Services
         Task<List<AuctionDto>> GetListRecentlyViewedAsync();
         Task<List<AuctionDto>> GetTop10Auctions();
         Task<List<AuctionDto>> GetSellerAuctionsHistory();
-
+        Task<List<AuctionDto>> GetBuyerAuctionsHistory();
     }
     public class AuctionService : IAuctionService
     {
@@ -66,7 +66,7 @@ namespace OnlineAuctionWeb.Application.Services
                     throw new CustomException(StatusCodes.Status404NotFound, "Auction not found!");
                 }
 
-                if(auction.UserId != _currentUserService.UserId || _currentUserService.Role != "Admin")
+                if (auction.UserId != _currentUserService.UserId || _currentUserService.Role != "Admin")
                 {
                     throw new CustomException(StatusCodes.Status401Unauthorized, "You are not authorized to change the status of this auction!");
                 }
@@ -246,6 +246,28 @@ namespace OnlineAuctionWeb.Application.Services
             }
         }
 
+        public async Task<List<AuctionDto>> GetBuyerAuctionsHistory()
+        {
+            try
+            {
+                if (_currentUserService.UserId == null)
+                {
+                    throw new CustomException(StatusCodes.Status401Unauthorized, "Invalid token!");
+                }
+
+                var auctions = await _context.Auctions
+                    .Where(a => _context.Bids.Any(b => b.UserId == _currentUserService.UserId && b.AuctionId == a.Id))
+                    .ToListAsync();
+
+                return _mapper.Map<List<AuctionDto>>(auctions);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                throw;
+            }
+        }
+
         public async Task<AuctionDto> GetByIdAsync(int id)
         {
             var auction = await _context.Auctions.FindAsync(id);
@@ -278,7 +300,7 @@ namespace OnlineAuctionWeb.Application.Services
             auctionDto.BidCount = auction.Bids.Count();
             auctionDto.User.ratings = _feedbackService.GetAverageRatingByUserId(auction.UserId);
 
-            if(_currentUserService.UserId != null)
+            if (_currentUserService.UserId != null)
             {
                 await _watchListService.AddToWatchListAsync(new CreateWatchListDto((int)_currentUserService.UserId, id, WatchListTypeEnum.RecentlyViewed));
             }

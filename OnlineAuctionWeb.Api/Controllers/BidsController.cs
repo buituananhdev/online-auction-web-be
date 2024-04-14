@@ -44,7 +44,7 @@ namespace OnlineAuctionWeb.Api.Controllers
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [RolesAuthorize(RequiredRoles = new RoleEnum[] { RoleEnum.Seller })]
+        [RolesAuthorize(RequiredRoles = new RoleEnum[] { RoleEnum.Buyer })]
         public async Task<IActionResult> CreateBid([FromBody] CreateBidDto bidDto)
         {
             await _bidService.CreateAsync(bidDto);
