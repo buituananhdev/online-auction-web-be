@@ -220,7 +220,7 @@ namespace OnlineAuctionWeb.Application.Services
                     auctionDto.BidCount = auction.Bids.Count();
                     auctionDto.User = _mapper.Map<UserDto>(auction.User);
                     auctionDto.User.ratings = _feedbackService.GetAverageRatingByUserId(auction.UserId);
-                    auctionDto.CategoryName = auction.Category.CategoryName;
+                    auctionDto.Category = auction.Category;
                     auctionDtos.Add(auctionDto);
                 }
 
@@ -333,7 +333,7 @@ namespace OnlineAuctionWeb.Application.Services
                     var auctionDto = _mapper.Map<AuctionDto>(auction);
                     auctionDto.User = _mapper.Map<UserDto>(auction.User);
                     auctionDto.User.ratings = _feedbackService.GetAverageRatingByUserId(auction.UserId);
-                    auctionDto.CategoryName = auction.Category.CategoryName;
+                    auctionDto.Category = auction.Category;
                     auctionDtos.Add(auctionDto);
                 }
 
@@ -391,7 +391,7 @@ namespace OnlineAuctionWeb.Application.Services
                     auctionDto.BidCount = auction.Bids.Count();
                     auctionDto.User = _mapper.Map<UserDto>(auction.User);
                     auctionDto.User.ratings = _feedbackService.GetAverageRatingByUserId(auction.UserId);
-                    auctionDto.CategoryName = auction.Category.CategoryName;
+                    auctionDto.Category = auction.Category;
                     auctionDtos.Add(auctionDto);
                 }
 
