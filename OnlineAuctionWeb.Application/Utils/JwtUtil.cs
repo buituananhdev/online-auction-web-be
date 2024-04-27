@@ -44,6 +44,7 @@ namespace OnlineAuctionWeb.Infrastructure.Utils
             token.AccessToken = tokenHandler.WriteToken(jwtToken);
             token.ExpirationTime = expiresIn.ToUnixTimeSeconds();
             token.CreatedAt = DateTime.Now;
+            token.Role = user.Role.ToString();
             return token;
         }
 
