@@ -17,5 +17,6 @@ namespace OnlineAuctionWeb.Domain.Payloads
         public long? ExpirationTime { get; set; }
 
         public DateTime? CreatedAt { get; set; }
+        public string Role { get; set; }
     }
 }
