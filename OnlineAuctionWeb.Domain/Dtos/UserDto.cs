@@ -18,6 +18,6 @@ namespace OnlineAuctionWeb.Domain.Dtos
         public string Avatar { get; set; }
         public RoleEnum Role { get; set; }
         public StatusEnum Status { get; set; }
-        public AvarageRatingPayload ratings { get; set; }
+        public AvarageRatingPayload? ratings { get; set; }
     }
 }

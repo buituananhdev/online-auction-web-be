@@ -37,8 +37,12 @@ namespace OnlineAuctionWeb.Application.Services
                 }
 
                 createWatchListDto.UserId = (int)_currentUserService.UserId;
-                _context.WatchList.Add(_mapper.Map<WatchList>(createWatchListDto));
-                await _context.SaveChangesAsync();
+                bool isExist = _context.WatchList.Any(x => x.UserId == createWatchListDto.UserId && x.AuctionId == createWatchListDto.AuctionId);
+                if(!isExist)
+                {
+                    _context.WatchList.Add(_mapper.Map<WatchList>(createWatchListDto));
+                    await _context.SaveChangesAsync();
+                }
             }
             catch (Exception ex)
             {

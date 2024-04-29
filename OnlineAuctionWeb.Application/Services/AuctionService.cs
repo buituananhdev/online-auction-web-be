@@ -432,6 +432,9 @@ namespace OnlineAuctionWeb.Application.Services
                 int userId = (int)_currentUserService.UserId;
 
                 var query = _context.Auctions
+                    .Include(a => a.Bids) // Include bids related to auction
+                    .Include(a => a.User) // Include seller information
+                    .Include(a => a.Category) // Include category information
                     .Where(a => a.UserId == userId)
                     .AsQueryable();
 
@@ -450,10 +453,10 @@ namespace OnlineAuctionWeb.Application.Services
 
                 var totalPages = (int)Math.Ceiling((double)totalAuctions / pageSize);
 
-                // Map auctions to AuctionDtos
                 var auctionDtos = auctions.Select(auction =>
                 {
                     var auctionDto = _mapper.Map<AuctionDto>(auction);
+                    auctionDto.BidCount = auction.Bids.Count();
                     auctionDto.User = _mapper.Map<UserDto>(auction.User);
                     auctionDto.User.ratings = _feedbackService.GetAverageRatingByUserId(auction.UserId);
                     auctionDto.Category = _mapper.Map<CategoryDto>(auction.Category);
