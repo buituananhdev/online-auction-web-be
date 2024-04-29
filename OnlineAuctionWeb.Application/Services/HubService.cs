@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.SignalR;
 using OnlineAuctionWeb.Application.Hubs;
 using OnlineAuctionWeb.Domain.Dtos;
+using OnlineAuctionWeb.Domain.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -104,6 +105,7 @@ namespace OnlineAuctionWeb.Application.Services
             try
             {
                 await _auctionHub.Clients.Group(groupId.ToString()).SendAsync(AuctionHub.RECEIVE_NOTIFICATION, notification);
+                //await _auctionHub.Clients.All.SendAsync(AuctionHub.RECEIVE_NOTIFICATION, notification);
             } catch(Exception ex)
             {
                 Console.WriteLine(ex);

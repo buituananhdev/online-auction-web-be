@@ -81,7 +81,7 @@ namespace OnlineAuctionWeb.Application.Hubs
 
                 foreach (var auction in watchList)
                 {
-                    await Groups.AddToGroupAsync(Context.ConnectionId, $"Auction-{auction}");
+                    await Groups.AddToGroupAsync(Context.ConnectionId, auction);
                 }
 
                 await base.OnConnectedAsync();
@@ -91,7 +91,6 @@ namespace OnlineAuctionWeb.Application.Hubs
                 Console.WriteLine(ex.Message);
                 throw;
             }
-
         }
 
         public void SendMessage(string message)
