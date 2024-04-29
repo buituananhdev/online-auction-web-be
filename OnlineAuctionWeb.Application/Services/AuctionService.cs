@@ -257,11 +257,11 @@ namespace OnlineAuctionWeb.Application.Services
         }
 
         public async Task<PaginatedResult<AuctionDto>> GetBuyerAuctionsHistory(
-    int pageNumber,
-    int pageSize,
-    string searchQuery = null,
-    bool isSuccess = false
-)
+            int pageNumber,
+            int pageSize,
+            string searchQuery = null,
+            bool isSuccess = false
+        )
         {
             try
             {
@@ -273,20 +273,22 @@ namespace OnlineAuctionWeb.Application.Services
                 var userId = _currentUserService.UserId.Value;
 
                 var query = _context.Auctions
+                    .Include(a => a.Bids) // Include bids related to auction
+                    .Include(a => a.User) // Include seller information
+                    .Include(a => a.Category) // Include category information
                     .Where(a => _context.Bids.Any(b => b.UserId == userId && b.AuctionId == a.Id))
                     .AsQueryable();
 
                 if (isSuccess)
                 {
-                    var winningAuctionIds = _context.Bids
+                    var winningAuctionIds = await _context.Bids
                         .Where(b => b.UserId == userId)
                         .GroupBy(b => b.AuctionId)
-                        .Select(g => g.OrderByDescending(b => b.BidAmount).FirstOrDefault())
-                        .Where(b => b != null && b.Auction.EndTime < DateTime.Now)
-                        .Select(b => b.AuctionId)
-                        .ToList();
+                        .Select(g => g.OrderByDescending(b => b.BidAmount).FirstOrDefault().AuctionId)
+                        .Where(auctionId => _context.Auctions.Any(a => a.Id == auctionId && a.EndTime < DateTime.Now))
+                        .ToListAsync();
 
-                    query = query.Where(a => winningAuctionIds.Contains(a.Id));
+                            query = query.Where(a => winningAuctionIds.Contains(a.Id));
                 }
 
                 if (!string.IsNullOrEmpty(searchQuery))
