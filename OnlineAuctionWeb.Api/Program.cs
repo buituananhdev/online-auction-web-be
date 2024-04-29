@@ -62,16 +62,11 @@ builder.Services.AddInfrastructure();
 
 var app = builder.Build();
 
-builder.Services.AddCors(options =>
+app.UseCors(builder =>
 {
-    options.AddDefaultPolicy(
-        builder =>
-        {
-            builder
-                .AllowAnyOrigin()
-                .AllowAnyHeader()
-                .AllowAnyMethod();
-        });
+    builder.AllowAnyOrigin()
+           .AllowAnyMethod()
+           .AllowAnyHeader();
 });
 
 app.MapGet("/", async context =>
