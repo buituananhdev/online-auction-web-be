@@ -1,16 +1,23 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.SignalR;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using OnlineAuctionWeb.Application.Exceptions;
 using OnlineAuctionWeb.Application.Services;
-using OnlineAuctionWeb.Infrastructure.Hubs.Schemas;
+using OnlineAuctionWeb.Application.Hubs.Schemas;
 using System.Collections.Concurrent;
+using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
+using System.Text;
 
-namespace OnlineAuctionWeb.Infrastructure.Hubs
+namespace OnlineAuctionWeb.Application.Hubs
 {
     public sealed class AuctionHub : Hub
     {
+        public const string ERROR = "ERROR";
         public const string USER_JOIN_AUCTION = "USER_JOIN_AUCTION";
         public const string USER_LEAVE_AUCTION = "USER_LEAVE_AUCTION";
+        public const string RECEIVE_NOTIFICATION = "RECEIVE_NOTIFICATION";
 
         private readonly IHubContext<AuctionHub> _hubContext;
         private readonly IWatchListService _watchListService;
@@ -27,13 +34,39 @@ namespace OnlineAuctionWeb.Infrastructure.Hubs
         {
             try
             {
-                if (_currentUserService.UserId == null)
+                var httpContext = Context.GetHttpContext();
+                var configuration = httpContext.RequestServices.GetService<IConfiguration>();
+                var token = httpContext.Request.Query["access_token"].ToString();
+                Console.WriteLine(token);
+                var tmp = Context.ConnectionId;
+                if (string.IsNullOrEmpty(token))
                 {
                     throw new CustomException(StatusCodes.Status401Unauthorized, "Invalid token!");
                 }
 
+                var tokenHandler = new JwtSecurityTokenHandler();
+                var key = Encoding.ASCII.GetBytes(configuration["JwtSettings:Secret"]);
+                tokenHandler.ValidateToken(
+                    token,
+                    new TokenValidationParameters
+                    {
+                        ValidateIssuerSigningKey = true,
+                        IssuerSigningKey = new SymmetricSecurityKey(key),
+                        ValidateIssuer = false,
+                        ValidateAudience = false,
+                    },
+                    out SecurityToken validatedToken
+                );
+
+                var jwtToken =
+                    (JwtSecurityToken)validatedToken ?? throw new UnauthorizedAccessException();
+                var claims = jwtToken.Claims;
+                var userId = int.Parse(
+                    claims.FirstOrDefault(x => x.Type == "ID")?.Value
+                );
+
                 Console.WriteLine("User connected");
-                int userId = (int)_currentUserService.UserId;
+                //int userId = (int)_currentUserService.UserId;
                 var watchList = await _watchListService.GetListAuctionIdsByUserIDAsync(userId);
 
                 var userConnection = Users.GetOrAdd(

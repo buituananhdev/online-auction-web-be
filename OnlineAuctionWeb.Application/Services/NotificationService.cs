@@ -14,39 +14,65 @@ namespace OnlineAuctionWeb.Application.Services
     public interface INotificationService
     {
         Task SendNotificationAsync(int userId, CreateNotificationDto notificationDto);
+        Task SendAuctionNotificationAsync(int auctionId, CreateNotificationDto notificationDto);
         Task<List<NotificationDto>> GetListNotifications();
     }
     public class NotificationService : INotificationService
     {
         private readonly DataContext _context;
         private readonly IMapper _mapper;
+        private readonly IWatchListService _watchListService;
         private readonly ICurrentUserService _currentUserService;
-        public NotificationService(DataContext context, IMapper mapper, ICurrentUserService currentUserService)
+        private readonly IHubService _hubService;
+        public NotificationService(DataContext context, IMapper mapper, ICurrentUserService currentUserService, IHubService hubService, IWatchListService watchListService)
         {
             _context = context;
             _mapper = mapper;
             _currentUserService = currentUserService;
+            _hubService = hubService;
+            _watchListService = watchListService;
         }
-        public async Task<List<NotificationDto>> GetListNotifications()
+
+        public Task<List<NotificationDto>> GetListNotifications()
         {
-            try {
-                var notifications = await _context.Notifications.Include(x => x.UserNotifications).Where(x => x.UserNotifications.Any(x => x.UserId == _currentUserService.UserId)).ToListAsync();
-                return _mapper.Map<List<NotificationDto>>(notifications);
-            } catch (Exception ex) {
+            throw new NotImplementedException();
+        }
+
+        public async Task SendAuctionNotificationAsync(int auctionId, CreateNotificationDto notificationDto)
+        {
+            try
+            {
+                var notification = _mapper.Map<Notification>(notificationDto);
+                _context.Notifications.Add(notification);
+                await _context.SaveChangesAsync();
+                
+                var userIds = await _watchListService.GetListUserIdsByAuctionIDAsync(auctionId);
+                List<UserNotification> userNotifications = new List<UserNotification>();
+                foreach(var user in userIds)
+                {
+                    var userNotification = new CreateUserNotificationsDto
+                    {
+                        UserId = int.Parse(user),
+                        NotificationId = notification.Id,
+                        IsRead = false
+                    };
+
+                    userNotifications.Add(_mapper.Map<UserNotification>(userNotification));
+                }
+
+                _context.UserNotifications.AddRange(userNotifications);
+                await _context.SaveChangesAsync();
+
+                _hubService.SendGroupNotification(auctionId, _mapper.Map<NotificationDto>(notification));
+            } catch(Exception ex)
+            {
                 throw;
             }
         }
 
-        public async Task SendNotificationAsync(int userId, CreateNotificationDto notificationDto)
+        public Task SendNotificationAsync(int userId, CreateNotificationDto notificationDto)
         {
-            try {
-                var notification = _mapper.Map<Notification>(notificationDto);
-                await _context.Notifications.AddAsync(notification);
-                await _context.UserNotifications.AddAsync(new UserNotification { UserId = userId, Notification = notification, IsRead = false });
-                await _context.SaveChangesAsync();
-            } catch (Exception ex) {
-                throw;
-            }
+            throw new NotImplementedException();
         }
     }
 }

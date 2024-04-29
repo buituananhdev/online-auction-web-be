@@ -4,7 +4,7 @@ using OnlineAuctionWeb.Application.Services;
 using OnlineAuctionWeb.Domain.Dtos;
 using OnlineAuctionWeb.Domain.Enums;
 using OnlineAuctionWeb.Infrastructure.Authorize;
-using OnlineAuctionWeb.Infrastructure.Hubs;
+using OnlineAuctionWeb.Application.Hubs;
 using System;
 using System.Linq;
 using System.Threading.Tasks;

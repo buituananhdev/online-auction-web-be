@@ -5,7 +5,7 @@ using OnlineAuctionWeb.Domain;
 using OnlineAuctionWeb.Application.Mappings;
 using OnlineAuctionWeb.Infrastructure.Middleware;
 using OnlineAuctionWeb.Infrastructure;
-using OnlineAuctionWeb.Infrastructure.Hubs;
+using OnlineAuctionWeb.Application.Hubs;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -64,10 +64,12 @@ var app = builder.Build();
 
 app.UseCors(builder =>
 {
-    builder.AllowAnyOrigin()
+    builder.WithOrigins("http://localhost:3013")
            .AllowAnyMethod()
-           .AllowAnyHeader();
+           .AllowAnyHeader()
+           .AllowCredentials();
 });
+
 
 app.MapGet("/", async context =>
 {

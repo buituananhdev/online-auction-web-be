@@ -11,6 +11,7 @@ namespace OnlineAuctionWeb.Application.Services
     public interface IWatchListService
     {
         Task<List<string>> GetListAuctionIdsByUserIDAsync(int userID);
+        Task<List<string>> GetListUserIdsByAuctionIDAsync(int auctionID);
         Task AddToWatchListAsync(CreateWatchListDto createWatchListDto);
     }
     public class WatchListService : IWatchListService
@@ -58,6 +59,23 @@ namespace OnlineAuctionWeb.Application.Services
                 return watchLists;
             }
             catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                throw;
+            }
+        }
+
+        public async Task<List<string>> GetListUserIdsByAuctionIDAsync(int auctionID)
+        {
+            try
+            {
+                var userIds = await _context.WatchList
+                .Where(x => x.AuctionId == auctionID)
+                .Select(x => x.UserId.ToString())
+                .ToListAsync();
+
+                return userIds;
+            } catch (Exception ex)
             {
                 Console.WriteLine(ex.Message);
                 throw;
