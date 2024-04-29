@@ -6,6 +6,7 @@ using OnlineAuctionWeb.Domain.Dtos;
 using OnlineAuctionWeb.Domain.Enums;
 using OnlineAuctionWeb.Domain.Payloads;
 using OnlineAuctionWeb.Application.Exceptions;
+using OnlineAuctionWeb.Domain.Models;
 
 namespace OnlineAuctionWeb.Application.Services
 {
@@ -21,17 +22,19 @@ namespace OnlineAuctionWeb.Application.Services
         private readonly IMapper _mapper;
         private readonly IAuctionService _auctionService;
         private readonly ICurrentUserService _currentUserService;
+        private readonly INotificationService _notificationService;
         private readonly ProductStatusEnum[] INVALID_AUCTION_STATUSES = new[]
         {
             ProductStatusEnum.Canceled, ProductStatusEnum.Ended, ProductStatusEnum.PendingPublish
         };
 
-        public BidService(DataContext context, IMapper mapper, IAuctionService auctionService, ICurrentUserService currentUserService)
+        public BidService(DataContext context, IMapper mapper, IAuctionService auctionService, ICurrentUserService currentUserService, INotificationService notificationService)
         {
             _context = context;
             _mapper = mapper;
             _auctionService = auctionService;
             _currentUserService = currentUserService;
+            _notificationService = notificationService;
         }
 
         public async Task CreateAsync(CreateBidDto bidDto)
@@ -60,11 +63,13 @@ namespace OnlineAuctionWeb.Application.Services
                     await _auctionService.UpdateProductStatusAsync(auction.Id, ProductStatusEnum.Ended);
                 }
 
-                var user = _mapper.Map<Domain.Models.Bid>(bidDto);
-                user.UserId = (int)_currentUserService.UserId;
+                var bid = _mapper.Map<Bid>(bidDto);
+                bid.UserId = (int)_currentUserService.UserId;
 
-                await _context.Bids.AddAsync(user);
+                await _context.Bids.AddAsync(bid);
                 await _auctionService.UpdateCurrentPriceAsync(bidDto.AuctionId, bidDto.BidAmount);
+                await _context.SaveChangesAsync();
+                //_notificationService.SendNotificationAsync(auctionId);
             }
             catch (Exception ex)
             {

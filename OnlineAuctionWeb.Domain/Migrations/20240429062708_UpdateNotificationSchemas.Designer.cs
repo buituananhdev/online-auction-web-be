@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using OnlineAuctionWeb.Domain;
 
@@ -11,9 +12,11 @@ using OnlineAuctionWeb.Domain;
 namespace OnlineAuctionWeb.Domain.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20240429062708_UpdateNotificationSchemas")]
+    partial class UpdateNotificationSchemas
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -227,6 +230,9 @@ namespace OnlineAuctionWeb.Domain.Migrations
                     b.Property<string>("Content")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<bool>("IsRead")
+                        .HasColumnType("bit");
+
                     b.Property<string>("RedirectUrl")
                         .HasColumnType("nvarchar(max)");
 
@@ -236,10 +242,12 @@ namespace OnlineAuctionWeb.Domain.Migrations
                     b.Property<string>("Title")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("Type")
+                    b.Property<int>("UserId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("Notifications");
                 });
@@ -341,24 +349,6 @@ namespace OnlineAuctionWeb.Domain.Migrations
                         .IsUnique();
 
                     b.ToTable("Users");
-                });
-
-            modelBuilder.Entity("OnlineAuctionWeb.Domain.Models.UserNotification", b =>
-                {
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("NotificationId")
-                        .HasColumnType("int");
-
-                    b.Property<bool>("IsRead")
-                        .HasColumnType("bit");
-
-                    b.HasKey("UserId", "NotificationId");
-
-                    b.HasIndex("NotificationId");
-
-                    b.ToTable("UserNotifications");
                 });
 
             modelBuilder.Entity("OnlineAuctionWeb.Domain.Models.WatchList", b =>
@@ -465,6 +455,17 @@ namespace OnlineAuctionWeb.Domain.Migrations
                     b.Navigation("ToUser");
                 });
 
+            modelBuilder.Entity("OnlineAuctionWeb.Domain.Models.Notification", b =>
+                {
+                    b.HasOne("OnlineAuctionWeb.Domain.Models.User", "User")
+                        .WithMany("Notifications")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("OnlineAuctionWeb.Domain.Models.Payment", b =>
                 {
                     b.HasOne("OnlineAuctionWeb.Domain.Models.Bid", "Bid")
@@ -474,25 +475,6 @@ namespace OnlineAuctionWeb.Domain.Migrations
                         .IsRequired();
 
                     b.Navigation("Bid");
-                });
-
-            modelBuilder.Entity("OnlineAuctionWeb.Domain.Models.UserNotification", b =>
-                {
-                    b.HasOne("OnlineAuctionWeb.Domain.Models.Notification", "Notification")
-                        .WithMany("UserNotifications")
-                        .HasForeignKey("NotificationId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("OnlineAuctionWeb.Domain.Models.User", "User")
-                        .WithMany("UserNotifications")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Notification");
-
-                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("OnlineAuctionWeb.Domain.Models.WatchList", b =>
@@ -532,22 +514,17 @@ namespace OnlineAuctionWeb.Domain.Migrations
                     b.Navigation("Products");
                 });
 
-            modelBuilder.Entity("OnlineAuctionWeb.Domain.Models.Notification", b =>
-                {
-                    b.Navigation("UserNotifications");
-                });
-
             modelBuilder.Entity("OnlineAuctionWeb.Domain.Models.User", b =>
                 {
                     b.Navigation("Bids");
+
+                    b.Navigation("Notifications");
 
                     b.Navigation("Products");
 
                     b.Navigation("ReceivedFeedbacks");
 
                     b.Navigation("SentFeedbacks");
-
-                    b.Navigation("UserNotifications");
                 });
 #pragma warning restore 612, 618
         }

@@ -34,8 +34,14 @@
         RecentlyViewed = 1,
         WatchList = 2,
         Bidding = 3,
-        Won = 4,
-        Lost = 5
+        Won = 4
+    }
+
+    public enum NotificationType
+    {
+        UpdatePrice = 1,
+        Feedback = 2,
+        AuctionEnd = 3
     }
 
     public enum VnpayResponseCode

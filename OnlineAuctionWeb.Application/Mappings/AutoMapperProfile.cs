@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using OnlineAuctionWeb.Application.Services;
 using OnlineAuctionWeb.Domain.Dtos;
 using OnlineAuctionWeb.Domain.Models;
 
@@ -34,6 +35,10 @@ namespace OnlineAuctionWeb.Application.Mappings
             // Notification profile
             CreateMap<Notification, NotificationDto>().ReverseMap();
             CreateMap<CreateNotificationDto, Notification>().ReverseMap();
+
+            // UserNotification profile
+            CreateMap<UserNotification, CreateUserNotificationsDto>().ReverseMap();
+            CreateMap<CreateUserNotificationsDto, UserNotification>().ReverseMap();
         }
     }
 }

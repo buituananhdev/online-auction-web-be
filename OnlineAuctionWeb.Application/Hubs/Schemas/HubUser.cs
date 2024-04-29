@@ -1,4 +1,4 @@
-﻿namespace OnlineAuctionWeb.Infrastructure.Hubs.Schemas
+﻿namespace OnlineAuctionWeb.Application.Hubs.Schemas
 {
     public class HubUser
     {
