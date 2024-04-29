@@ -29,7 +29,7 @@ namespace OnlineAuctionWeb.Infrastructure.Middleware
             {
                 context.Response.StatusCode = StatusCodes.Status500InternalServerError;
                 context.Response.ContentType = "application/json";
-                var response = new { error = "An unexpected error occurred.", code = StatusCodes.Status500InternalServerError };
+                var response = new { error = "An unexpected error occurred." + ex.Message, code = StatusCodes.Status500InternalServerError };
                 await context.Response.WriteAsync(JsonConvert.SerializeObject(response));
             }
         }

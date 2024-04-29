@@ -163,25 +163,41 @@ namespace OnlineAuctionWeb.Api.Controllers
         /// <summary>
         /// Retrieves the auction history for the seller.
         /// </summary>
+        /// <param name="pageNumber">The page number for pagination.</param>
+        /// <param name="pageSize">The size of each page.</param>
+        /// <param name="searchQuery">Optional. A search query to filter auctions by name or description.</param>
+        /// <param name="status">Optional. Filters auctions by their status.</param>
         /// <returns>Returns the auction history for the seller.</returns>
         [HttpGet("seller-history")]
         [RolesAuthorize(RequiredRoles = new RoleEnum[] { RoleEnum.Seller })]
-        public async Task<IActionResult> GetSellerAuctionsHistory()
+        public async Task<IActionResult> GetSellerAuctionsHistory(
+            int pageNumber = 1,
+            int pageSize = 10,
+            string searchQuery = null,
+            ProductStatusEnum? status = null
+        )
         {
-            var result = await _auctionService.GetSellerAuctionsHistory();
+            var result = await _auctionService.GetSellerAuctionsHistory(pageNumber, pageSize, searchQuery, status);
             return Ok(result);
         }
-
 
         /// <summary>
         /// Retrieves the auction history for the buyer.
         /// </summary>
+        /// <param name="pageNumber">The page number for pagination.</param>
+        /// <param name="pageSize">The size of each page.</param>
+        /// <param name="searchQuery">Optional. A search query to filter auctions by name or description.</param>
+        /// <param name="isSuccess">Optional. Filters auctions by their success status.</param>
         /// <returns>Returns the auction history for the buyer.</returns>
         [HttpGet("buyer-history")]
         [RolesAuthorize(RequiredRoles = new RoleEnum[] { RoleEnum.Buyer })]
-        public async Task<IActionResult> GetBuyerAuctionsHistory()
+        public async Task<IActionResult> GetBuyerAuctionsHistory(
+            int pageNumber = 1,
+            int pageSize = 10,
+            string searchQuery = null,
+            bool isSuccess = false)
         {
-            var result = await _auctionService.GetBuyerAuctionsHistory();
+            var result = await _auctionService.GetBuyerAuctionsHistory(pageNumber, pageSize, searchQuery, isSuccess);
             return Ok(result);
         }
     }
