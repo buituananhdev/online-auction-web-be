@@ -69,7 +69,16 @@ namespace OnlineAuctionWeb.Application.Services
                 await _context.Bids.AddAsync(bid);
                 await _auctionService.UpdateCurrentPriceAsync(bidDto.AuctionId, bidDto.BidAmount);
                 await _context.SaveChangesAsync();
-                //_notificationService.SendNotificationAsync(auctionId);
+                var notificationDto = new CreateNotificationDto
+                {
+                    Title = "New bid",
+                    Content = $"You have a new bid on auction {auction.ProductName}",
+                    RedirectUrl = $"/auctions/{auction.Id}",
+                    RelatedID = auction.Id,
+                    Type = NotificationType.UpdatePrice,
+                };
+
+                await _notificationService.SendAuctionNotificationAsync(auction.Id, notificationDto);
             }
             catch (Exception ex)
             {

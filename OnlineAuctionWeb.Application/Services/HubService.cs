@@ -85,7 +85,7 @@ namespace OnlineAuctionWeb.Application.Services
         {
             try
             {
-                var connectionIds = await AuctionHub.GetConnectionsByUserId(notification.UserId);
+                var connectionIds = await AuctionHub.GetConnectionsByUserId(notification.Id);
                 if (connectionIds is not null)
                 {
                     await _auctionHub.Clients
