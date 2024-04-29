@@ -36,8 +36,18 @@ namespace OnlineAuctionWeb.Application.Services
         Task SeedData(int count);
         Task<List<AuctionDto>> GetListRecentlyViewedAsync();
         Task<List<AuctionDto>> GetTop10Auctions();
-        Task<List<AuctionDto>> GetSellerAuctionsHistory();
-        Task<List<AuctionDto>> GetBuyerAuctionsHistory();
+        Task<PaginatedResult<AuctionDto>> GetSellerAuctionsHistory(
+            int pageNumber,
+            int pageSize,
+            string searchQuery = null,
+            ProductStatusEnum? status = null
+        );
+        Task<PaginatedResult<AuctionDto>> GetBuyerAuctionsHistory(
+            int pageNumber,
+            int pageSize,
+            string searchQuery = null,
+            bool isSuccess = false
+        );
     }
     public class AuctionService : IAuctionService
     {
@@ -246,7 +256,12 @@ namespace OnlineAuctionWeb.Application.Services
             }
         }
 
-        public async Task<List<AuctionDto>> GetBuyerAuctionsHistory()
+        public async Task<PaginatedResult<AuctionDto>> GetBuyerAuctionsHistory(
+    int pageNumber,
+    int pageSize,
+    string searchQuery = null,
+    bool isSuccess = false
+)
         {
             try
             {
@@ -255,29 +270,83 @@ namespace OnlineAuctionWeb.Application.Services
                     throw new CustomException(StatusCodes.Status401Unauthorized, "Invalid token!");
                 }
 
-                var auctions = await _context.Auctions
-                    .Where(a => _context.Bids.Any(b => b.UserId == _currentUserService.UserId && b.AuctionId == a.Id))
+                var userId = _currentUserService.UserId.Value;
+
+                var query = _context.Auctions
+                    .Where(a => _context.Bids.Any(b => b.UserId == userId && b.AuctionId == a.Id))
+                    .AsQueryable();
+
+                if (isSuccess)
+                {
+                    var winningAuctionIds = _context.Bids
+                        .Where(b => b.UserId == userId)
+                        .GroupBy(b => b.AuctionId)
+                        .Select(g => g.OrderByDescending(b => b.BidAmount).FirstOrDefault())
+                        .Where(b => b != null && b.Auction.EndTime < DateTime.Now)
+                        .Select(b => b.AuctionId)
+                        .ToList();
+
+                    query = query.Where(a => winningAuctionIds.Contains(a.Id));
+                }
+
+                if (!string.IsNullOrEmpty(searchQuery))
+                {
+                    query = query.Where(a =>
+                        a.ProductName.Contains(searchQuery) ||
+                        a.Description.Contains(searchQuery)
+                    );
+                }
+
+                var totalAuctions = await query.CountAsync();
+
+                var auctions = await query
+                    .OrderByDescending(a => a.EndTime)
+                    .Skip((pageNumber - 1) * pageSize)
+                    .Take(pageSize)
                     .ToListAsync();
 
-                return _mapper.Map<List<AuctionDto>>(auctions);
+                var totalPages = (int)Math.Ceiling((double)totalAuctions / pageSize);
+
+                var auctionDtos = auctions.Select(auction =>
+                {
+                    var auctionDto = _mapper.Map<AuctionDto>(auction);
+                    auctionDto.BidCount = auction.Bids.Count();
+                    auctionDto.User = _mapper.Map<UserDto>(auction.User);
+                    auctionDto.User.ratings = _feedbackService.GetAverageRatingByUserId(auction.UserId);
+                    auctionDto.Category = _mapper.Map<CategoryDto>(auction.Category);
+                    return auctionDto;
+                }).ToList();
+
+                var meta = new PaginatedMeta
+                {
+                    CurrentPage = pageNumber,
+                    TotalPages = totalPages,
+                    PageSize = pageSize,
+                };
+
+                var result = new PaginatedResult<AuctionDto>
+                {
+                    Meta = meta,
+                    Data = auctionDtos
+                };
+
+                return result;
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.Message);
+                Console.WriteLine("Err: " + ex.Message);
                 throw;
             }
         }
 
         public async Task<AuctionDto> GetByIdAsync(int id)
         {
-            var auction = await _context.Auctions.FindAsync(id);
-            if (auction == null)
-            {
-                throw new CustomException(StatusCodes.Status404NotFound, "Auction not found!");
-            }
+            var auction = await _context.Auctions
+                .Include(x => x.Bids)
+                .FirstOrDefaultAsync(x => x.Id == id);
 
             var auctionDto = _mapper.Map<AuctionDto>(auction);
-            auctionDto.BidCount = auction.Bids.Count();
+            auctionDto.BidCount = auction.Bids.Count;
             return auctionDto;
         }
 
@@ -346,7 +415,12 @@ namespace OnlineAuctionWeb.Application.Services
             }
         }
 
-        public async Task<List<AuctionDto>> GetSellerAuctionsHistory()
+        public async Task<PaginatedResult<AuctionDto>> GetSellerAuctionsHistory(
+            int pageNumber,
+            int pageSize,
+            string searchQuery = null,
+            ProductStatusEnum? status = null
+        )
         {
             try
             {
@@ -357,19 +431,56 @@ namespace OnlineAuctionWeb.Application.Services
 
                 int userId = (int)_currentUserService.UserId;
 
-                var auctions = await _context.Auctions
+                var query = _context.Auctions
                     .Where(a => a.UserId == userId)
+                    .AsQueryable();
+
+                if (status != null)
+                {
+                    query = query.Where(a => a.ProductStatus == status);
+                }
+
+                var totalAuctions = await query.CountAsync();
+
+                var auctions = await query
+                    .OrderByDescending(a => a.EndTime)
+                    .Skip((pageNumber - 1) * pageSize)
+                    .Take(pageSize)
                     .ToListAsync();
 
-                return _mapper.Map<List<AuctionDto>>(auctions);
+                var totalPages = (int)Math.Ceiling((double)totalAuctions / pageSize);
+
+                // Map auctions to AuctionDtos
+                var auctionDtos = auctions.Select(auction =>
+                {
+                    var auctionDto = _mapper.Map<AuctionDto>(auction);
+                    auctionDto.User = _mapper.Map<UserDto>(auction.User);
+                    auctionDto.User.ratings = _feedbackService.GetAverageRatingByUserId(auction.UserId);
+                    auctionDto.Category = _mapper.Map<CategoryDto>(auction.Category);
+                    return auctionDto;
+                }).ToList();
+
+                var meta = new PaginatedMeta
+                {
+                    CurrentPage = pageNumber,
+                    TotalPages = totalPages,
+                    PageSize = pageSize,
+                };
+
+                var result = new PaginatedResult<AuctionDto>
+                {
+                    Meta = meta,
+                    Data = auctionDtos
+                };
+
+                return result;
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.Message);
+                Console.WriteLine("Err: " + ex.Message);
                 throw;
             }
         }
-
 
         public async Task<List<AuctionDto>> GetTop10Auctions()
         {
