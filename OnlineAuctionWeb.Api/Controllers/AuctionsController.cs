@@ -195,9 +195,10 @@ namespace OnlineAuctionWeb.Api.Controllers
             int pageNumber = 1,
             int pageSize = 10,
             string searchQuery = null,
-            bool isSuccess = false)
+            BidStatusEnum? status = null
+        )
         {
-            var result = await _auctionService.GetBuyerAuctionsHistory(pageNumber, pageSize, searchQuery, isSuccess);
+            var result = await _auctionService.GetBuyerAuctionsHistory(pageNumber, pageSize, searchQuery, status);
             return Ok(result);
         }
     }

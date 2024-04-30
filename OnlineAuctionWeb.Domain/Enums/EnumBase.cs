@@ -37,6 +37,14 @@
         Won = 4
     }
 
+
+    public enum BidStatusEnum
+    {
+        InProgress = 1,
+        Winning = 2,
+        Lost = 3
+    }
+
     public enum NotificationType
     {
         UpdatePrice = 1,
