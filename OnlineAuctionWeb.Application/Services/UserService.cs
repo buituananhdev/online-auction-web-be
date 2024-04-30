@@ -25,6 +25,7 @@ namespace OnlineAuctionWeb.Application.Services
         User FindUserByEmailAsync(string email);
         Task<bool> UserExistsByEmailAsync(string email);
         Task<int> GetUserRoleByIdAsync(int id);
+        Task<UserDto> GetMe();
     }
 
     public class UserService : IUserService
@@ -32,11 +33,13 @@ namespace OnlineAuctionWeb.Application.Services
         private readonly DataContext _context;
         private readonly IMapper _mapper;
         private readonly IFeedbackService _feedbackService;
-        public UserService(DataContext contex, IMapper mapper, IFeedbackService feedbackService)
+        private readonly ICurrentUserService _currentUserService;
+        public UserService(DataContext contex, IMapper mapper, IFeedbackService feedbackService, ICurrentUserService currentUserService)
         {
             _context = contex;
             _mapper = mapper;
             _feedbackService = feedbackService;
+            _currentUserService = currentUserService;
         }
         public async Task CreateAsync(CreateUserDto userDto)
         {
@@ -218,6 +221,18 @@ namespace OnlineAuctionWeb.Application.Services
             catch (Exception ex)
             {
                 Console.WriteLine("Err", ex.Message);
+                throw;
+            }
+        }
+
+        public async Task<UserDto> GetMe()
+        {
+            try
+            {
+                var user = await _context.Users.FirstOrDefaultAsync(x => x.Id == _currentUserService.UserId);
+                return _mapper.Map<UserDto>(user);
+            } catch (Exception ex)
+            {
                 throw;
             }
         }
