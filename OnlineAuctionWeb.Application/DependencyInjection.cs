@@ -21,6 +21,7 @@ namespace OnlineAuctionWeb.Application
             services.AddScoped<ICurrentUserService, CurrentUserService>();
             services.AddScoped<INotificationService, NotificationService>();
             services.AddScoped<IHubService, HubService>();
+            services.AddScoped<IFeedbackService, FeedbackService>();
             services.AddHttpContextAccessor();
 
             var key = Encoding.ASCII.GetBytes(configration.GetSection("JwtSettings:Secret").Value!);

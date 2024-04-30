@@ -440,6 +440,14 @@ namespace OnlineAuctionWeb.Application.Services
                     .Where(a => a.UserId == userId)
                     .AsQueryable();
 
+                if (!string.IsNullOrEmpty(searchQuery))
+                {
+                    query = query.Where(a =>
+                        a.ProductName.Contains(searchQuery) ||
+                        a.Description.Contains(searchQuery)
+                    );
+                }
+
                 if (status != null)
                 {
                     query = query.Where(a => a.ProductStatus == status);

@@ -22,7 +22,7 @@ namespace OnlineAuctionWeb.Application.Services
         private readonly IMapper _mapper;
         private readonly IAuctionService _auctionService;
         private readonly ICurrentUserService _currentUserService;
-        private readonly INotificationService _notificationService;
+        private readonly INotificationService _notificationService; 
         private readonly ProductStatusEnum[] INVALID_AUCTION_STATUSES = new[]
         {
             ProductStatusEnum.Canceled, ProductStatusEnum.Ended, ProductStatusEnum.PendingPublish

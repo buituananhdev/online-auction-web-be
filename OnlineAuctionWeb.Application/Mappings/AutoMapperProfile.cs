@@ -39,6 +39,10 @@ namespace OnlineAuctionWeb.Application.Mappings
             // UserNotification profile
             CreateMap<UserNotification, CreateUserNotificationsDto>().ReverseMap();
             CreateMap<CreateUserNotificationsDto, UserNotification>().ReverseMap();
+
+            // Feedback profile
+            CreateMap<Feedback, FeedBackDto>().ReverseMap();
+            CreateMap<CreateFeedBackDto, Feedback>().ReverseMap();
         }
     }
 }

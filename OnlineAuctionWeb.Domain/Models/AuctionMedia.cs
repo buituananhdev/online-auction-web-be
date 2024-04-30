@@ -10,7 +10,7 @@ namespace OnlineAuctionWeb.Domain.Models
     {
         public int Id { get; set; }
         public string MediaUrl { get; set; }
-        public int ProductId { get; set; }
+        public int AuctionId { get; set; }
         public Auction Auction { get; set; }
     }
 }
