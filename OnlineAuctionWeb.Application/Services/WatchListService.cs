@@ -21,6 +21,7 @@ namespace OnlineAuctionWeb.Application.Services
             string? searchQuery = null,
             WatchListTypeEnum? type = null
        );
+        bool IsWatched(int auctionID);
     }
     public class WatchListService : IWatchListService
     {
@@ -164,6 +165,19 @@ namespace OnlineAuctionWeb.Application.Services
                 };
 
                 return result;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                throw;
+            }
+        }
+
+        public bool IsWatched(int auctionID)
+        {
+            try 
+            {
+                return _context.WatchList.Any(x => x.UserId == _currentUserService.UserId && x.AuctionId == auctionID);
             }
             catch (Exception ex)
             {
