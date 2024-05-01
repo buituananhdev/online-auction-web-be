@@ -56,14 +56,16 @@ namespace OnlineAuctionWeb.Application.Services
         private readonly IFeedbackService _feedbackService;
         private readonly ICurrentUserService _currentUserService;
         private readonly IWatchListService _watchListService;
+        private readonly IAuctionMediaService _auctionMediaService;
 
-        public AuctionService(DataContext context, IMapper mapper, IFeedbackService feedbackService, ICurrentUserService currentUserService, IWatchListService watchListService)
+        public AuctionService(DataContext context, IMapper mapper, IFeedbackService feedbackService, ICurrentUserService currentUserService, IWatchListService watchListService, IAuctionMediaService auctionMediaService)
         {
             _context = context;
             _mapper = mapper;
             _feedbackService = feedbackService;
             _currentUserService = currentUserService;
             _watchListService = watchListService;
+            _auctionMediaService = auctionMediaService;
         }
 
         public async Task ChangeStatusAsync(int id, ProductStatusEnum status)
@@ -104,8 +106,8 @@ namespace OnlineAuctionWeb.Application.Services
                 auction.UserId = (int)_currentUserService.UserId;
                 auction.CurrentPrice = auction.StartingPrice;
                 _context.Auctions.Add(auction);
+                await _auctionMediaService.AddMediasToAuction(auction.Id, auctionDto.mediasUrl);
                 await _context.SaveChangesAsync();
-
                 return _mapper.Map<AuctionDto>(auction);
             }
             catch (Exception ex)
@@ -439,6 +441,14 @@ namespace OnlineAuctionWeb.Application.Services
                     .Include(a => a.Category) // Include category information
                     .Where(a => a.UserId == userId)
                     .AsQueryable();
+
+                if (!string.IsNullOrEmpty(searchQuery))
+                {
+                    query = query.Where(a =>
+                        a.ProductName.Contains(searchQuery) ||
+                        a.Description.Contains(searchQuery)
+                    );
+                }
 
                 if (status != null)
                 {
