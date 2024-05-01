@@ -375,7 +375,7 @@ namespace OnlineAuctionWeb.Application.Services
                 throw new CustomException(StatusCodes.Status404NotFound, "Auction not found!");
             }
 
-            auction.ViewCount = auction.ViewCount++;
+            auction.ViewCount++;
             await _context.SaveChangesAsync();
             var auctionDto = _mapper.Map<AuctionDto>(auction);
             auctionDto.BidCount = auction.Bids.Count();
@@ -412,6 +412,7 @@ namespace OnlineAuctionWeb.Application.Services
                 foreach (var auction in auctions)
                 {
                     var auctionDto = _mapper.Map<AuctionDto>(auction);
+                    auctionDto.BidCount = auction.Bids.Count();
                     auctionDto.User = _mapper.Map<UserDto>(auction.User);
                     auctionDto.User.ratings = _feedbackService.GetAverageRatingByUserId(auction.UserId);
                     auctionDto.Category = _mapper.Map<CategoryDto>(auction.Category);
@@ -523,6 +524,7 @@ namespace OnlineAuctionWeb.Application.Services
                 {
                     var auctionDto = _mapper.Map<AuctionDto>(auction);
                     auctionDto.BidCount = auction.Bids.Count();
+                    auctionDto.ViewCount = auction.ViewCount;
                     auctionDto.User = _mapper.Map<UserDto>(auction.User);
                     auctionDto.User.ratings = _feedbackService.GetAverageRatingByUserId(auction.UserId);
                     auctionDto.Category = _mapper.Map<CategoryDto>(auction.Category);
