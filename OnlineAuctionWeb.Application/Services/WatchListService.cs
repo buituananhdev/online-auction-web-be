@@ -49,6 +49,7 @@ namespace OnlineAuctionWeb.Application.Services
 
                 var watchlistDto = _mapper.Map<WatchList>(createWatchListDto);
                 watchlistDto.UserId = (int)_currentUserService.UserId;
+                watchlistDto.Type = WatchListTypeEnum.WatchList;
                 bool isExist = _context.WatchList.Any(x => x.UserId == watchlistDto.UserId && x.AuctionId == watchlistDto.AuctionId);
                 if (!isExist)
                 {
@@ -68,7 +69,7 @@ namespace OnlineAuctionWeb.Application.Services
             try
             {
                 var watchLists = await _context.WatchList
-                .Where(x => x.UserId == userID)
+                .Where(x => x.UserId == userID && x.Type == WatchListTypeEnum.WatchList)
                 .Select(x => x.AuctionId.ToString())
                 .ToListAsync();
 

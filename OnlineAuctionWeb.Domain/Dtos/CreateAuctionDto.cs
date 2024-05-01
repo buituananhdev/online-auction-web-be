@@ -28,7 +28,7 @@ namespace OnlineAuctionWeb.Domain.Dtos
 
         public bool CanReturn { get; set; } = false;
 
-        public ProductStatusEnum ProductStatus { get; set; } = ProductStatusEnum.Available;
+        public ProductStatusEnum ProductStatus { get; set; } = ProductStatusEnum.InProgess;
 
         [Required(ErrorMessage = "Category ID is required")]
         [Range(1, int.MaxValue, ErrorMessage = "Category ID must be greater than 0")]

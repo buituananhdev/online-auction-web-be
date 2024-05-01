@@ -22,11 +22,10 @@
 
     public enum ProductStatusEnum
     {
-        Available = 1,
+        InProgess = 1,
         Ended = 2,
-        Deleted = 3,
-        Canceled = 4,
-        PendingPublish = 5
+        Canceled = 3,
+        PendingPublish = 4
     }
 
     public enum WatchListTypeEnum
@@ -34,7 +33,6 @@
         RecentlyViewed = 1,
         WatchList = 2,
         Bidding = 3,
-        Won = 4
     }
 
 
