@@ -15,6 +15,7 @@ namespace OnlineAuctionWeb.Application.Services
         Task<List<string>> GetListAuctionIdsByUserIDAsync(int userID);
         Task<List<string>> GetListUserIdsByAuctionIDAsync(int auctionID);
         Task AddToWatchListAsync(CreateWatchListDto createWatchListDto);
+        Task UnWatch(int auctionID);
         Task<PaginatedResult<AuctionDto>> GetWatchListByUserIDAsync(
             int pageNumber,
             int pageSize,
@@ -179,6 +180,30 @@ namespace OnlineAuctionWeb.Application.Services
             try 
             {
                 return _context.WatchList.Any(x => x.UserId == _currentUserService.UserId && x.AuctionId == auctionID);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                throw;
+            }
+        }
+
+        public async Task UnWatch(int auctionID)
+        {
+            try
+            {
+                if (_currentUserService.UserId == null)
+                {
+                    throw new CustomException(StatusCodes.Status401Unauthorized, "Invalid token!");
+                }
+
+                var watchRecord = _context.WatchList.FirstOrDefault(x => x.UserId == _currentUserService.UserId && x.AuctionId == auctionID);
+
+                if (watchRecord != null)
+                {
+                    _context.WatchList.Remove(watchRecord);
+                    await _context.SaveChangesAsync();
+                }
             }
             catch (Exception ex)
             {
