@@ -17,6 +17,7 @@ namespace OnlineAuctionWeb.Application.Services
         Task SendAsync(IEnumerable<string> connectionIds, string method, object arg1);
         Task RemoveUsersFromGroupHub(int groupID, List<int> userIds);
         Task AddUsersToGroupHub(int groupID, List<int> userIds);
+        Task AddUserToGroupHub(int groupID, int userID);
         Task SendNotification(NotificationDto message);
         Task SendGroupNotification(int groupId, NotificationDto message);
     }
@@ -105,10 +106,23 @@ namespace OnlineAuctionWeb.Application.Services
             try
             {
                 await _auctionHub.Clients.Group(groupId.ToString()).SendAsync(AuctionHub.RECEIVE_NOTIFICATION, notification);
-                //await _auctionHub.Clients.All.SendAsync(AuctionHub.RECEIVE_NOTIFICATION, notification);
             } catch(Exception ex)
             {
                 Console.WriteLine(ex);
+            }
+        }
+
+        public async Task AddUserToGroupHub(int groupID, int userId)
+        {
+            var connectionIds = await AuctionHub.GetConnectionsByUserId(userId);
+            if (connectionIds is not null)
+            {
+                foreach (var connectionId in connectionIds)
+                {
+                    await AddToGroupAsync(connectionId, groupID.ToString());
+                }
+
+                await SendAsync(connectionIds, AuctionHub.USER_JOIN_AUCTION, groupID);
             }
         }
     }

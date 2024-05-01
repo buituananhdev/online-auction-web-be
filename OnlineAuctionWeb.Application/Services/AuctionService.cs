@@ -57,12 +57,13 @@ namespace OnlineAuctionWeb.Application.Services
         private readonly ICurrentUserService _currentUserService;
         private readonly IWatchListService _watchListService;
         private readonly IAuctionMediaService _auctionMediaService;
+        private readonly IHubService _hubService;
         private readonly ProductStatusEnum[] INVALID_AUCTION_STATUSES = new[]
         {
             ProductStatusEnum.Canceled, ProductStatusEnum.Ended, ProductStatusEnum.PendingPublish
         };
 
-        public AuctionService(DataContext context, IMapper mapper, IFeedbackService feedbackService, ICurrentUserService currentUserService, IWatchListService watchListService, IAuctionMediaService auctionMediaService)
+        public AuctionService(DataContext context, IMapper mapper, IFeedbackService feedbackService, ICurrentUserService currentUserService, IWatchListService watchListService, IAuctionMediaService auctionMediaService, IHubService hubService)
         {
             _context = context;
             _mapper = mapper;
@@ -70,6 +71,7 @@ namespace OnlineAuctionWeb.Application.Services
             _currentUserService = currentUserService;
             _watchListService = watchListService;
             _auctionMediaService = auctionMediaService;
+            _hubService = hubService;
         }
 
         public async Task ChangeStatusAsync(int id, ProductStatusEnum status)
@@ -392,6 +394,8 @@ namespace OnlineAuctionWeb.Application.Services
             {
                 await _watchListService.AddToWatchListAsync(new CreateWatchListDto(id, WatchListTypeEnum.RecentlyViewed));
             }
+
+            await _hubService.AddUserToGroupHub(auction.Id, (int)_currentUserService.UserId);
 
             return auctionDto;
         }
