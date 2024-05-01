@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using OnlineAuctionWeb.Application.Services;
 using OnlineAuctionWeb.Domain.Dtos;
 using OnlineAuctionWeb.Domain.Enums;
@@ -97,6 +98,18 @@ namespace OnlineAuctionWeb.Api.Controllers
         {
             await _userService.DeleteAsync(id);
             return Ok(new { Message = "User deleted successfully." });
+        }
+
+        /// <summary>
+        /// Get the current user.
+        /// </summary>
+        /// <returns>Returns current user information.</returns>
+        [HttpGet]
+        [Route("me")]
+        [Authorize]
+        public async Task<IActionResult> GetMe()
+        {
+            return Ok(await _userService.GetMe());
         }
     }
 }
