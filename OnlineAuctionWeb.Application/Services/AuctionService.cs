@@ -57,6 +57,10 @@ namespace OnlineAuctionWeb.Application.Services
         private readonly ICurrentUserService _currentUserService;
         private readonly IWatchListService _watchListService;
         private readonly IAuctionMediaService _auctionMediaService;
+        private readonly ProductStatusEnum[] INVALID_AUCTION_STATUSES = new[]
+        {
+            ProductStatusEnum.Canceled, ProductStatusEnum.Ended, ProductStatusEnum.PendingPublish
+        };
 
         public AuctionService(DataContext context, IMapper mapper, IFeedbackService feedbackService, ICurrentUserService currentUserService, IWatchListService watchListService, IAuctionMediaService auctionMediaService)
         {
@@ -161,6 +165,7 @@ namespace OnlineAuctionWeb.Application.Services
                     .Include(a => a.Bids) // Include bids related to auction
                     .Include(a => a.User) // Include seller information
                     .Include(a => a.Category) // Include category information
+                    .Where(a => !INVALID_AUCTION_STATUSES.Contains(a.ProductStatus))
                     .AsQueryable();
 
                 // Filter by search query (fuzzy search)
@@ -402,11 +407,15 @@ namespace OnlineAuctionWeb.Application.Services
 
                 var query = _context.WatchList
                     .Where(wl => wl.UserId == _currentUserService.UserId && wl.Type == WatchListTypeEnum.RecentlyViewed)
-                    .Join(_context.Auctions, wl => wl.AuctionId, a => a.Id, (wl, a) => a)
+                    .Join(_context.Auctions.Where(a => !INVALID_AUCTION_STATUSES.Contains(a.ProductStatus)),
+                        wl => wl.AuctionId,
+                        a => a.Id,
+                        (wl, a) => a)
                     .Include(a => a.Bids)
                     .Include(a => a.Category)
                     .Include(a => a.User)
                     .AsQueryable();
+
 
                 var auctions = await query.ToListAsync();
 
@@ -517,7 +526,7 @@ namespace OnlineAuctionWeb.Application.Services
                     .Include(a => a.Bids)
                     .Include(a => a.User)
                     .Include(a => a.Category)
-                    .Where(a => a.EndTime > DateTime.Now && a.Bids.Any())
+                    .Where(a => a.EndTime > DateTime.Now && a.Bids.Any() && !INVALID_AUCTION_STATUSES.Contains(a.ProductStatus))
                     .OrderByDescending(a => a.Bids.Count)
                     .Take(10)
                     .ToListAsync();
