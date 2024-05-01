@@ -46,7 +46,7 @@ namespace OnlineAuctionWeb.Application.Services
             int pageNumber,
             int pageSize,
             string searchQuery = null,
-            bool isSuccess = false
+            BidStatusEnum? status = null
         );
     }
     public class AuctionService : IAuctionService
@@ -262,7 +262,7 @@ namespace OnlineAuctionWeb.Application.Services
             int pageNumber,
             int pageSize,
             string searchQuery = null,
-            bool isSuccess = false
+            BidStatusEnum? status = null
         )
         {
             try
@@ -281,7 +281,15 @@ namespace OnlineAuctionWeb.Application.Services
                     .Where(a => _context.Bids.Any(b => b.UserId == userId && b.AuctionId == a.Id))
                     .AsQueryable();
 
-                if (isSuccess)
+                if (!string.IsNullOrEmpty(searchQuery))
+                {
+                    query = query.Where(a =>
+                        a.ProductName.Contains(searchQuery) ||
+                        a.Description.Contains(searchQuery)
+                    );
+                }
+
+                if (status == BidStatusEnum.Winning)
                 {
                     var winningAuctionIds = await _context.Bids
                         .Where(b => b.UserId == userId)
@@ -290,15 +298,15 @@ namespace OnlineAuctionWeb.Application.Services
                         .Where(auctionId => _context.Auctions.Any(a => a.Id == auctionId && a.EndTime < DateTime.Now))
                         .ToListAsync();
 
-                            query = query.Where(a => winningAuctionIds.Contains(a.Id));
+                     query = query.Where(a => winningAuctionIds.Contains(a.Id));
                 }
-
-                if (!string.IsNullOrEmpty(searchQuery))
+                else if (status == BidStatusEnum.InProgress)
                 {
-                    query = query.Where(a =>
-                        a.ProductName.Contains(searchQuery) ||
-                        a.Description.Contains(searchQuery)
-                    );
+                    query = query.Where(a => a.EndTime > DateTime.Now);
+                }
+                else if (status == BidStatusEnum.Lost)
+                {
+                    query = query.Where(a => a.EndTime < DateTime.Now);
                 }
 
                 var totalAuctions = await query.CountAsync();
