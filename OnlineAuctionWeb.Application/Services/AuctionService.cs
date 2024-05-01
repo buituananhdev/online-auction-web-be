@@ -110,8 +110,8 @@ namespace OnlineAuctionWeb.Application.Services
                 auction.UserId = (int)_currentUserService.UserId;
                 auction.CurrentPrice = auction.StartingPrice;
                 _context.Auctions.Add(auction);
-                await _auctionMediaService.AddMediasToAuction(auction.Id, auctionDto.mediasUrl);
                 await _context.SaveChangesAsync();
+                await _auctionMediaService.AddMediasToAuction(auction.Id, auctionDto.mediasUrl);
                 return _mapper.Map<AuctionDto>(auction);
             }
             catch (Exception ex)
