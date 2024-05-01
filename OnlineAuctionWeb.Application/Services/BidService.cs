@@ -23,18 +23,20 @@ namespace OnlineAuctionWeb.Application.Services
         private readonly IAuctionService _auctionService;
         private readonly ICurrentUserService _currentUserService;
         private readonly INotificationService _notificationService; 
+        private readonly IHubService _hubService;
         private readonly ProductStatusEnum[] INVALID_AUCTION_STATUSES = new[]
         {
             ProductStatusEnum.Canceled, ProductStatusEnum.Ended, ProductStatusEnum.PendingPublish
         };
 
-        public BidService(DataContext context, IMapper mapper, IAuctionService auctionService, ICurrentUserService currentUserService, INotificationService notificationService)
+        public BidService(DataContext context, IMapper mapper, IAuctionService auctionService, ICurrentUserService currentUserService, INotificationService notificationService, IHubService hubService)
         {
             _context = context;
             _mapper = mapper;
             _auctionService = auctionService;
             _currentUserService = currentUserService;
             _notificationService = notificationService;
+            _hubService = hubService;
         }
 
         public async Task CreateAsync(CreateBidDto bidDto)
@@ -77,7 +79,7 @@ namespace OnlineAuctionWeb.Application.Services
                     RelatedID = auction.Id,
                     Type = NotificationType.UpdatePrice,
                 };
-
+                await _hubService.AddUserToGroupHub(auction.Id, (int)_currentUserService.UserId);
                 await _notificationService.SendAuctionNotificationAsync(auction.Id, notificationDto);
             }
             catch (Exception ex)
