@@ -30,6 +30,20 @@ namespace OnlineAuctionWeb.Api.Controllers
         }
 
         /// <summary>
+        /// Remove auction from watch list
+        /// </summary>
+        /// <param name="auctionID"></param>
+        /// <returns></returns>
+        /// <response code="200">Returns the watch list</response>
+        /// <response code="401">Invalid token</response>
+        [HttpDelete]
+        public async Task<IActionResult> UnWatch(int auctionID)
+        {
+            await _watchListService.UnWatch(auctionID);
+            return Ok();
+        }
+
+        /// <summary>
         /// Get watch list by user ID
         /// </summary>
         /// <param name="pageNumber"></param>
