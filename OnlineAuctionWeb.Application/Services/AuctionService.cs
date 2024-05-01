@@ -383,7 +383,7 @@ namespace OnlineAuctionWeb.Application.Services
 
             if (_currentUserService.UserId != null)
             {
-                await _watchListService.AddToWatchListAsync(new CreateWatchListDto((int)_currentUserService.UserId, id, WatchListTypeEnum.RecentlyViewed));
+                await _watchListService.AddToWatchListAsync(new CreateWatchListDto(id, WatchListTypeEnum.RecentlyViewed));
             }
 
             return auctionDto;
