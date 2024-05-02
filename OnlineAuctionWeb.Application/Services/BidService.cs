@@ -80,7 +80,7 @@ namespace OnlineAuctionWeb.Application.Services
                     Type = NotificationType.UpdatePrice,
                 };
                 await _hubService.AddUserToGroupHub(auction.Id, (int)_currentUserService.UserId);
-                await _notificationService.SendAuctionNotificationAsync(auction.Id, notificationDto);
+                await _notificationService.SendAuctionNotificationAsync(auction.Id, auction.User.Id, notificationDto);
             }
             catch (Exception ex)
             {

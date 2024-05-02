@@ -18,7 +18,7 @@ namespace OnlineAuctionWeb.Application.Services
         Task RemoveUsersFromGroupHub(int groupID, List<int> userIds);
         Task AddUsersToGroupHub(int groupID, List<int> userIds);
         Task AddUserToGroupHub(int groupID, int userID);
-        Task SendNotification(NotificationDto message);
+        Task SendNotification(int userId, NotificationDto message);
         Task SendGroupNotification(int groupId, NotificationDto message);
     }
     public class HubService : IHubService
@@ -83,11 +83,11 @@ namespace OnlineAuctionWeb.Application.Services
             }
         }
 
-        public async Task SendNotification(NotificationDto notification)
+        public async Task SendNotification(int userId, NotificationDto notification)
         {
             try
             {
-                var connectionIds = await AuctionHub.GetConnectionsByUserId(notification.Id);
+                var connectionIds = await AuctionHub.GetConnectionsByUserId(userId);
                 if (connectionIds is not null)
                 {
                     await _auctionHub.Clients

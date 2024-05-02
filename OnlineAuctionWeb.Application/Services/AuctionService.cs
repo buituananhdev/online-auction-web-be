@@ -365,6 +365,7 @@ namespace OnlineAuctionWeb.Application.Services
         {
             var auction = await _context.Auctions
                 .Include(x => x.Bids)
+                .Include(x => x.User)
                 .FirstOrDefaultAsync(x => x.Id == id);
 
             var auctionDto = _mapper.Map<AuctionDto>(auction);
