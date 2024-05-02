@@ -34,7 +34,7 @@ namespace OnlineAuctionWeb.Domain.Dtos
         [Range(1, int.MaxValue, ErrorMessage = "Category ID must be greater than 0")]
         public int CategoryId { get; set; }
 
-        public List<string>? mediasUrl { get; set; }
+        public List<string>? mediaUrls{ get; set; }
     }
 
     public class FutureDateAttribute : ValidationAttribute

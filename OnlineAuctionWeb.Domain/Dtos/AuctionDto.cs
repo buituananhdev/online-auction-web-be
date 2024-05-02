@@ -25,5 +25,6 @@ namespace OnlineAuctionWeb.Domain.Dtos
         public bool IsWatched { get; set; }
         public UserDto User { get; set; }
         public CategoryDto Category { get; set; }
+        public List<string>? mediaUrls { get; set; }
     }
 }
