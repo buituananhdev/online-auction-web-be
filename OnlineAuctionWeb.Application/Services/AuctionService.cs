@@ -113,7 +113,7 @@ namespace OnlineAuctionWeb.Application.Services
                 auction.CurrentPrice = auction.StartingPrice;
                 _context.Auctions.Add(auction);
                 await _context.SaveChangesAsync();
-                await _auctionMediaService.AddMediasToAuction(auction.Id, auctionDto.mediasUrl);
+                await _auctionMediaService.AddMediasToAuction(auction.Id, auctionDto.mediaUrls);
                 return _mapper.Map<AuctionDto>(auction);
             }
             catch (Exception ex)
@@ -241,6 +241,7 @@ namespace OnlineAuctionWeb.Application.Services
                     auctionDto.User.ratings = _feedbackService.GetAverageRatingByUserId(auction.UserId);
                     auctionDto.Category = _mapper.Map<CategoryDto>(auction.Category);
                     auctionDto.IsWatched = _watchListService.IsWatched(auction.Id);
+                    auctionDto.mediaUrls = _auctionMediaService.GetAuctionMediaUrls(auction.Id);
                     auctionDtos.Add(auctionDto);
                 }
 
@@ -334,6 +335,7 @@ namespace OnlineAuctionWeb.Application.Services
                     auctionDto.User = _mapper.Map<UserDto>(auction.User);
                     auctionDto.User.ratings = _feedbackService.GetAverageRatingByUserId(auction.UserId);
                     auctionDto.Category = _mapper.Map<CategoryDto>(auction.Category);
+                    auctionDto.mediaUrls = _auctionMediaService.GetAuctionMediaUrls(auction.Id);
                     return auctionDto;
                 }).ToList();
 
@@ -389,6 +391,7 @@ namespace OnlineAuctionWeb.Application.Services
             auctionDto.BidCount = auction.Bids.Count();
             auctionDto.User.ratings = _feedbackService.GetAverageRatingByUserId(auction.UserId);
             auctionDto.IsWatched = _watchListService.IsWatched(auction.Id);
+            auctionDto.mediaUrls = _auctionMediaService.GetAuctionMediaUrls(auction.Id);
 
             if (_currentUserService.UserId != null)
             {
@@ -432,6 +435,7 @@ namespace OnlineAuctionWeb.Application.Services
                     auctionDto.User.ratings = _feedbackService.GetAverageRatingByUserId(auction.UserId);
                     auctionDto.Category = _mapper.Map<CategoryDto>(auction.Category);
                     auctionDto.IsWatched = _watchListService.IsWatched(auction.Id);
+                    auctionDto.mediaUrls = _auctionMediaService.GetAuctionMediaUrls(auction.Id);
                     auctionDtos.Add(auctionDto);
                 }
 
@@ -497,6 +501,7 @@ namespace OnlineAuctionWeb.Application.Services
                     auctionDto.User = _mapper.Map<UserDto>(auction.User);
                     auctionDto.User.ratings = _feedbackService.GetAverageRatingByUserId(auction.UserId);
                     auctionDto.Category = _mapper.Map<CategoryDto>(auction.Category);
+                    auctionDto.mediaUrls = _auctionMediaService.GetAuctionMediaUrls(auction.Id);
                     return auctionDto;
                 }).ToList();
 
@@ -545,6 +550,7 @@ namespace OnlineAuctionWeb.Application.Services
                     auctionDto.User.ratings = _feedbackService.GetAverageRatingByUserId(auction.UserId);
                     auctionDto.Category = _mapper.Map<CategoryDto>(auction.Category);
                     auctionDto.IsWatched = _watchListService.IsWatched(auction.Id);
+                    auctionDto.mediaUrls = _auctionMediaService.GetAuctionMediaUrls(auction.Id);
                     auctionDtos.Add(auctionDto);
                 }
 
