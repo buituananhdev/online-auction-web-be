@@ -62,7 +62,7 @@ namespace OnlineAuctionWeb.Domain
 
             modelBuilder.Entity<Feedback>()
                 .HasIndex(f => new { f.FromUserId, f.ToUserId })
-                .IsUnique();
+                .IsUnique(false);
 
             modelBuilder.Entity<Category>()
                 .HasIndex(c => new { c.CategoryName })

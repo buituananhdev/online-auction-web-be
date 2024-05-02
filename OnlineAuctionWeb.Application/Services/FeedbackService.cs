@@ -1,5 +1,7 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
+using OnlineAuctionWeb.Application.Exceptions;
 using OnlineAuctionWeb.Domain;
 using OnlineAuctionWeb.Domain.Dtos;
 using OnlineAuctionWeb.Domain.Models;
@@ -31,6 +33,11 @@ namespace OnlineAuctionWeb.Application.Services
         {
             try
             {
+                var isExist = _context.Feedbacks.Any(f => f.FromUserId == _currentUserService.UserId && f.ToUserId == createFeedBackDto.ToUserId && f.RelatedID == createFeedBackDto.RelatedID);
+                if (isExist)
+                {
+                    throw new CustomException(StatusCodes.Status400BadRequest, "You have already rated this user!");
+                }
                 var feedbackDto = _mapper.Map<Feedback>(createFeedBackDto);
                 feedbackDto.FromUserId = (int)_currentUserService.UserId;
                 _context.Feedbacks.Add(feedbackDto);

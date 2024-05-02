@@ -43,6 +43,10 @@ namespace OnlineAuctionWeb.Application.Mappings
             // Feedback profile
             CreateMap<Feedback, FeedBackDto>().ReverseMap();
             CreateMap<CreateFeedBackDto, Feedback>().ReverseMap();
+
+            // Payment profile
+            CreateMap<Payment, CreatePaymentDto>().ReverseMap();
+            CreateMap<CreatePaymentDto, Payment>().ReverseMap();
         }
     }
 }

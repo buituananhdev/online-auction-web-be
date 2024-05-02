@@ -14,7 +14,7 @@ namespace OnlineAuctionWeb.Application.Services
     public interface INotificationService
     {
         Task SendNotificationAsync(int userId, CreateNotificationDto notificationDto);
-        Task SendAuctionNotificationAsync(int auctionId, CreateNotificationDto notificationDto);
+        Task SendAuctionNotificationAsync(int auctionId, int sellerId, CreateNotificationDto notificationDto);
         Task<List<NotificationDto>> GetListNotifications();
     }
     public class NotificationService : INotificationService
@@ -38,7 +38,7 @@ namespace OnlineAuctionWeb.Application.Services
             throw new NotImplementedException();
         }
 
-        public async Task SendAuctionNotificationAsync(int auctionId, CreateNotificationDto notificationDto)
+        public async Task SendAuctionNotificationAsync(int auctionId, int sellerId, CreateNotificationDto notificationDto)
         {
             try
             {
@@ -63,6 +63,7 @@ namespace OnlineAuctionWeb.Application.Services
                 _context.UserNotifications.AddRange(userNotifications);
                 await _context.SaveChangesAsync();
 
+                _hubService.SendNotification(sellerId, _mapper.Map<NotificationDto>(notification));
                 _hubService.SendGroupNotification(auctionId, _mapper.Map<NotificationDto>(notification));
             } catch(Exception ex)
             {
