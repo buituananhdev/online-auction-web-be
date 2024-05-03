@@ -74,9 +74,10 @@ namespace OnlineAuctionWeb.Application.Services
         {
             try
             {
-                var totalCaregories = await _context.Categories.CountAsync();
+                var totalCaregories = await _context.Categories.Where(x => x.Status != StatusEnum.Inactive).CountAsync();
 
                 var categories = await _context.Categories
+                    .Where(x => x.Status != StatusEnum.Inactive)
                     .Skip((pageNumber - 1) * pageSize)
                     .Take(pageSize)
                     .ToListAsync();
