@@ -63,17 +63,23 @@ namespace OnlineAuctionWeb.Application.Services
                 _context.UserNotifications.AddRange(userNotifications);
                 await _context.SaveChangesAsync();
 
-                _hubService.SendNotification(sellerId, _mapper.Map<NotificationDto>(notification));
-                _hubService.SendGroupNotification(auctionId, _mapper.Map<NotificationDto>(notification));
+                await _hubService.SendNotification(sellerId, _mapper.Map<NotificationDto>(notification));
+                await _hubService.SendGroupNotification(auctionId, _mapper.Map<NotificationDto>(notification));
             } catch(Exception ex)
             {
                 throw;
             }
         }
 
-        public Task SendNotificationAsync(int userId, CreateNotificationDto notificationDto)
+        public async Task SendNotificationAsync(int userId, CreateNotificationDto notificationDto)
         {
-            throw new NotImplementedException();
+            try
+            {
+                await _hubService.SendNotification(userId, _mapper.Map<NotificationDto>(notificationDto));
+            } catch (Exception ex)
+            {
+                throw;
+            }
         }
     }
 }

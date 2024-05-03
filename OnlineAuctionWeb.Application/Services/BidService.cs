@@ -13,6 +13,7 @@ namespace OnlineAuctionWeb.Application.Services
     public interface IBidService
     {
         Task<PaginatedResult<BidDto>> GetAllAsync(int pageNumber, int pageSize);
+        Task<AuctionDto> GetAuctionByBidIDAsync(int bidId);
         Task CreateAsync(CreateBidDto bidDto);
     }
 
@@ -22,7 +23,7 @@ namespace OnlineAuctionWeb.Application.Services
         private readonly IMapper _mapper;
         private readonly IAuctionService _auctionService;
         private readonly ICurrentUserService _currentUserService;
-        private readonly INotificationService _notificationService; 
+        private readonly INotificationService _notificationService;
         private readonly IHubService _hubService;
         private readonly ProductStatusEnum[] INVALID_AUCTION_STATUSES = new[]
         {
@@ -43,9 +44,9 @@ namespace OnlineAuctionWeb.Application.Services
         {
             try
             {
-                if(_currentUserService.UserId == null)
+                if (_currentUserService.UserId == null)
                 {
-                      throw new CustomException(StatusCodes.Status401Unauthorized, "Invalid token!");
+                    throw new CustomException(StatusCodes.Status401Unauthorized, "Invalid token!");
                 }
 
                 var auction = await _auctionService.GetByIdAsync(bidDto.AuctionId);
@@ -121,5 +122,25 @@ namespace OnlineAuctionWeb.Application.Services
                 throw;
             }
         }
+
+        public async Task<AuctionDto> GetAuctionByBidIDAsync(int bidId)
+        {
+            try
+            {
+                var auction = await _context.Bids
+                    .Include(x => x.Auction)
+                        .ThenInclude(x => x.User)
+                    .Where(x => x.Id == bidId)
+                    .Select(x => x.Auction)
+                    .FirstOrDefaultAsync();
+
+                return _mapper.Map<AuctionDto>(auction);
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+        }
+
     }
 }
