@@ -7,6 +7,7 @@ using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using OnlineAuctionWeb.Domain;
 using OnlineAuctionWeb.Domain.Dtos;
+using OnlineAuctionWeb.Domain.Enums;
 using OnlineAuctionWeb.Domain.Models;
 using OnlineAuctionWeb.Domain.Payloads;
 
@@ -25,20 +26,41 @@ namespace OnlineAuctionWeb.Application.Services
     {
         private readonly DataContext _context;
         private readonly IMapper _mapper;
-        public PaymentService(DataContext context, IMapper mapper)
+        private readonly INotificationService _notificationService;
+        private readonly IBidService _bidService;
+        public PaymentService(DataContext context, IMapper mapper, INotificationService notificationService, IBidService bidService)
         {
             _context = context;
             _mapper = mapper;
+            _notificationService = notificationService;
+            _bidService = bidService;
         }
         public async Task CreatePaymentAsync(CreatePaymentDto createPaymentDto)
         {
-            try {
-                _context.Add(_mapper.Map<Payment>(createPaymentDto));
+            try
+            {
+                var payment = _mapper.Map<Payment>(createPaymentDto);
+                _context.Payments.Add(payment);
                 await _context.SaveChangesAsync();
-            } catch(Exception ex) {
+
+                var auction = await _bidService.GetAuctionByBidIDAsync(createPaymentDto.BidId);
+
+                var notificationDto = new CreateNotificationDto
+                {
+                    Title = "New payment",
+                    Content = $"The customer has paid for your auction",
+                    RedirectUrl = $"/seller-history/{auction.Id}",
+                    RelatedID = auction.Id,
+                    Type = NotificationType.UpdatePrice,
+                };
+                await _notificationService.SendNotificationAsync(auction.User.Id, notificationDto);
+            }
+            catch (Exception ex)
+            {
                 throw;
             }
         }
+
 
         public async Task<PaginatedResult<PaymentDto>> GetAllAsync(
             int pageNumber,
