@@ -45,9 +45,10 @@
 
     public enum NotificationType
     {
-        UpdatePrice = 1,
+        NewBid = 1,
         Feedback = 2,
-        AuctionEnd = 3
+        AuctionEnd = 3,
+        NewPayment = 4
     }
 
     public enum VnpayResponseCode
