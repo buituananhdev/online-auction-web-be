@@ -26,6 +26,7 @@ namespace OnlineAuctionWeb.Application.Services
         Task<bool> UserExistsByEmailAsync(string email);
         Task<int> GetUserRoleByIdAsync(int id);
         Task<UserDto> GetMe();
+        Task ChangePassword(string newPassword);
     }
 
     public class UserService : IUserService
@@ -231,6 +232,25 @@ namespace OnlineAuctionWeb.Application.Services
             {
                 var user = await _context.Users.FirstOrDefaultAsync(x => x.Id == _currentUserService.UserId);
                 return _mapper.Map<UserDto>(user);
+            } catch (Exception ex)
+            {
+                throw;
+            }
+        }
+
+        public async Task ChangePassword(string newPassword)
+        {
+            try
+            {
+                if(string.IsNullOrEmpty(newPassword))
+                {
+                    throw new CustomException(StatusCodes.Status400BadRequest, "Please provide new password");
+                }
+
+                var user = await _context.Users.FindAsync(_currentUserService.UserId);
+                string hashedPassword = BCrypt.Net.BCrypt.HashPassword(newPassword);
+                user.Password = hashedPassword;
+                await _context.SaveChangesAsync();
             } catch (Exception ex)
             {
                 throw;
