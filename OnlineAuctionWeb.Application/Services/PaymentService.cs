@@ -47,11 +47,11 @@ namespace OnlineAuctionWeb.Application.Services
 
                 var notificationDto = new CreateNotificationDto
                 {
-                    Title = "New payment",
-                    Content = $"The customer has paid for your auction",
+                    Title = "Payment Confirmation: Auction Sold!",
+                    Content = $"Congratulations! Your auction has been successfully paid for by the customer.",
                     RedirectUrl = $"/seller-history/{auction.Id}",
                     RelatedID = auction.Id,
-                    Type = NotificationType.UpdatePrice,
+                    Type = NotificationType.NewPayment,
                 };
                 await _notificationService.SendNotificationAsync(auction.User.Id, notificationDto);
             }

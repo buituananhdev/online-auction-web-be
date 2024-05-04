@@ -8,6 +8,7 @@ using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using OnlineAuctionWeb.Domain;
 using OnlineAuctionWeb.Domain.Dtos;
+using OnlineAuctionWeb.Domain.Enums;
 using OnlineAuctionWeb.Domain.Models;
 
 namespace OnlineAuctionWeb.Application.Services
@@ -15,7 +16,7 @@ namespace OnlineAuctionWeb.Application.Services
     public interface INotificationService
     {
         Task SendNotificationAsync(int userId, CreateNotificationDto notificationDto);
-        Task SendAuctionNotificationAsync(int auctionId, int sellerId, CreateNotificationDto notificationDto);
+        Task NewBidNotification(AuctionDto auction, int sellerId);
         Task<List<NotificationDto>> GetListNotifications();
     }
     public class NotificationService : INotificationService
@@ -51,35 +52,59 @@ namespace OnlineAuctionWeb.Application.Services
             }
         }
 
-
-        public async Task SendAuctionNotificationAsync(int auctionId, int sellerId, CreateNotificationDto notificationDto)
+        public async Task NewBidNotification(AuctionDto auction, int sellerId)
         {
             try
             {
-                var notification = _mapper.Map<Notification>(notificationDto);
-                _context.Notifications.Add(notification);
-                await _context.SaveChangesAsync();
-                
-                var userIds = await _watchListService.GetListUserIdsByAuctionIDAsync(auctionId);
-                List<UserNotification> userNotifications = new List<UserNotification>();
-                foreach(var user in userIds)
+                var buyerNotificationDto = new CreateNotificationDto
                 {
-                    var userNotification = new CreateUserNotificationsDto
-                    {
-                        UserId = int.Parse(user),
-                        NotificationId = notification.Id,
-                        IsRead = false
-                    };
+                    Title = "Auction Update: New Bid Placed!",
+                    Content = $"A new bid has been placed on the auction for {auction.ProductName}",
+                    RedirectUrl = $"/auctions/{auction.Id}",
+                    RelatedID = auction.Id,
+                    Type = NotificationType.NewBid,
+                };
 
-                    userNotifications.Add(_mapper.Map<UserNotification>(userNotification));
-                }
+                var sellerNotificationDto = new CreateNotificationDto
+                {
+                    Title = "Bid Alert: New Offer Received!",
+                    Content = $"You've got a new bid on the {auction.ProductName} auction.",
+                    RedirectUrl = $"/auctions/{auction.Id}",
+                    RelatedID = auction.Id,
+                    Type = NotificationType.NewBid,
+                };
 
-                _context.UserNotifications.AddRange(userNotifications);
+                var buyerNotification = _mapper.Map<Notification>(buyerNotificationDto);
+                var sellerNotification = _mapper.Map<Notification>(sellerNotificationDto);
+
+                _context.Notifications.AddRange(buyerNotification, sellerNotification);
                 await _context.SaveChangesAsync();
 
-                await _hubService.SendNotification(sellerId, _mapper.Map<NotificationDto>(notification));
-                await _hubService.SendGroupNotification(auctionId, _mapper.Map<NotificationDto>(notification));
-            } catch(Exception ex)
+                var userIds = await _watchListService.GetListUserIdsByAuctionIDAsync(auction.Id);
+
+                var userNotifications = userIds.Select(userId => new CreateUserNotificationsDto
+                {
+                    UserId = int.Parse(userId),
+                    NotificationId = buyerNotification.Id,
+                    IsRead = false
+                }).ToList();
+
+                userNotifications.Add(new CreateUserNotificationsDto
+                {
+                    UserId = sellerId,
+                    NotificationId = sellerNotification.Id,
+                    IsRead = false
+                });
+
+                _context.UserNotifications.AddRange(userNotifications.Select(dto => _mapper.Map<UserNotification>(dto)));
+                await _context.SaveChangesAsync();
+
+                await Task.WhenAll(
+                    _hubService.SendNotification(sellerId, _mapper.Map<NotificationDto>(sellerNotification)),
+                    _hubService.SendGroupNotification(auction.Id, _mapper.Map<NotificationDto>(buyerNotification))
+                );
+            }
+            catch (Exception ex)
             {
                 throw;
             }
