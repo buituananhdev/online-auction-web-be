@@ -111,5 +111,19 @@ namespace OnlineAuctionWeb.Api.Controllers
         {
             return Ok(await _userService.GetMe());
         }
+
+        /// <summary>
+        ///  Change password.
+        /// </summary>
+        /// <param name="newPassword"></param>
+        /// <returns></returns>
+        [HttpPatch]
+        [Route("change-password")]
+        [Authorize]
+        public async Task<IActionResult> ChangePassword([FromBody] string newPassword)
+        {
+            await _userService.ChangePassword(newPassword);
+            return Ok();
+        }
     }
 }
