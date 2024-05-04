@@ -4,7 +4,7 @@ using OnlineAuctionWeb.Application.Services;
 
 namespace OnlineAuctionWeb.Api.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/notifications")]
     [ApiController]
     public class NotificationsController : ControllerBase
     {
@@ -14,7 +14,10 @@ namespace OnlineAuctionWeb.Api.Controllers
             _notificationService = notificationService;
         }
         
-
+        /// <summary>
+        /// Get user notification
+        /// </summary>
+        /// <returns></returns>
         [HttpGet]
         public async Task<IActionResult> GetNotifications()
         {

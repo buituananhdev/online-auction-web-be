@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 using AutoMapper;
@@ -33,10 +34,23 @@ namespace OnlineAuctionWeb.Application.Services
             _watchListService = watchListService;
         }
 
-        public Task<List<NotificationDto>> GetListNotifications()
+        public async Task<List<NotificationDto>> GetListNotifications()
         {
-            throw new NotImplementedException();
+            try
+            {
+                var notifications = await _context.Notifications
+                    .Include(x => x.UserNotifications)
+                    .Where(a => a.UserNotifications.Any(un => un.UserId == _currentUserService.UserId))
+                    .ToListAsync();
+
+                return _mapper.Map<List<NotificationDto>>(notifications);
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
         }
+
 
         public async Task SendAuctionNotificationAsync(int auctionId, int sellerId, CreateNotificationDto notificationDto)
         {
