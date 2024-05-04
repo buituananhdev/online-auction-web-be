@@ -67,6 +67,7 @@ namespace OnlineAuctionWeb.Application.Services
         {
             try {
                 var feedbacks = await _context.Feedbacks
+                    .Include(f => f.FromUser)
                     .Where(f => f.ToUserId == userId)
                     .ToListAsync();
 
