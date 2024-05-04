@@ -30,13 +30,15 @@ namespace OnlineAuctionWeb.Application.Services
         private readonly ICurrentUserService _currentUserService;
         private readonly IMapper _mapper;
         private readonly IFeedbackService _feedbackService;
+        private readonly IUserService _userService;
 
-        public WatchListService(DataContext context, ICurrentUserService currentUserService, IMapper mapper, IFeedbackService feedbackService)
+        public WatchListService(DataContext context, ICurrentUserService currentUserService, IMapper mapper, IFeedbackService feedbackService, IUserService userService)
         {
             _context = context;
             _currentUserService = currentUserService;
             _mapper = mapper;
             _feedbackService = feedbackService;
+            _userService = userService;
         }
 
         public async Task AddToWatchListAsync(CreateWatchListDto createWatchListDto)
@@ -46,6 +48,12 @@ namespace OnlineAuctionWeb.Application.Services
                 if (_currentUserService.UserId == null)
                 {
                     throw new CustomException(StatusCodes.Status401Unauthorized, "Invalid token!");
+                }
+
+                var user = await _userService.GetByIdAsync((int)_currentUserService.UserId);
+                if(user.Role != RoleEnum.Buyer)
+                {
+                    throw new CustomException(StatusCodes.Status400BadRequest, "Just buyer can add an auction to watch list");
                 }
 
                 var watchlistDto = _mapper.Map<WatchList>(createWatchListDto);

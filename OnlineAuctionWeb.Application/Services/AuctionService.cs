@@ -58,12 +58,13 @@ namespace OnlineAuctionWeb.Application.Services
         private readonly IWatchListService _watchListService;
         private readonly IAuctionMediaService _auctionMediaService;
         private readonly IHubService _hubService;
+        private readonly IUserService _userService;
         private readonly ProductStatusEnum[] INVALID_AUCTION_STATUSES = new[]
         {
             ProductStatusEnum.Canceled, ProductStatusEnum.Ended, ProductStatusEnum.PendingPublish
         };
 
-        public AuctionService(DataContext context, IMapper mapper, IFeedbackService feedbackService, ICurrentUserService currentUserService, IWatchListService watchListService, IAuctionMediaService auctionMediaService, IHubService hubService)
+        public AuctionService(DataContext context, IMapper mapper, IFeedbackService feedbackService, ICurrentUserService currentUserService, IWatchListService watchListService, IAuctionMediaService auctionMediaService, IHubService hubService, IUserService userService)
         {
             _context = context;
             _mapper = mapper;
@@ -72,6 +73,7 @@ namespace OnlineAuctionWeb.Application.Services
             _watchListService = watchListService;
             _auctionMediaService = auctionMediaService;
             _hubService = hubService;
+            _userService = userService;
         }
 
         public async Task ChangeStatusAsync(int id, ProductStatusEnum status)
@@ -394,7 +396,8 @@ namespace OnlineAuctionWeb.Application.Services
             auctionDto.IsWatched = _watchListService.IsWatched(auction.Id);
             auctionDto.mediaUrls = _auctionMediaService.GetAuctionMediaUrls(auction.Id);
 
-            if (_currentUserService.UserId != null)
+            var user = await _userService.GetByIdAsync((int)_currentUserService.UserId);
+            if (_currentUserService.UserId != null && user.Role == RoleEnum.Buyer)
             {
                 await _watchListService.AddToWatchListAsync(new CreateWatchListDto(id, WatchListTypeEnum.RecentlyViewed));
             }
