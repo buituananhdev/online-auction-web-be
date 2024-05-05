@@ -66,7 +66,6 @@ namespace OnlineAuctionWeb.Application.Services
             return tokenPayload;
         }
 
-
         public async Task<TokenPayload> Login(LoginDto loginDto)
         {
             try
