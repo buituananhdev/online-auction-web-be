@@ -27,6 +27,7 @@ namespace OnlineAuctionWeb.Application.Services
         Task<int> GetUserRoleByIdAsync(int id);
         Task<UserDto> GetMe();
         Task ChangePassword(ChangePasswordDto changePasswordDto);
+        Task<UserDto> UpdateProfile(UpdateProfileDto updateProfileDto);
     }
 
     public class UserService : IUserService
@@ -263,6 +264,32 @@ namespace OnlineAuctionWeb.Application.Services
                 await _context.SaveChangesAsync();
             } catch (Exception ex)
             {
+                throw;
+            }
+        }
+
+        public async Task<UserDto> UpdateProfile(UpdateProfileDto updateProfileDto)
+        {
+            try
+            {
+                if(_currentUserService == null)
+                {
+                    throw new CustomException(StatusCodes.Status401Unauthorized, "Invalid token!");
+                }
+
+                var user = await _context.Users.FindAsync(_currentUserService.UserId);
+                if (user == null)
+                {
+                    throw new CustomException(StatusCodes.Status404NotFound, "User not found!");
+                }
+
+                _mapper.Map(updateProfileDto, user);
+                await _context.SaveChangesAsync();
+                return _mapper.Map<UserDto>(user);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Err", ex.Message);
                 throw;
             }
         }

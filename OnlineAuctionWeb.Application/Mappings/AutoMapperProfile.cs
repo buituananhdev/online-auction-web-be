@@ -14,6 +14,7 @@ namespace OnlineAuctionWeb.Application.Mappings
             CreateMap<CreateUserDto, RegisterDto>().ReverseMap();
             CreateMap<User, CreateUserDto>().ReverseMap();
             CreateMap<UserDto, UpdateUserDto>().ReverseMap();
+            CreateMap<User, UpdateProfileDto>().ReverseMap();
 
             // Auction profile
             CreateMap<Auction, AuctionDto>().ReverseMap();
