@@ -118,12 +118,29 @@ namespace OnlineAuctionWeb.Api.Controllers
         /// <param name="newPassword"></param>
         /// <returns></returns>
         [HttpPatch]
-        [Route("change-password")]
+        [Route("/profile/change-password")]
         [Authorize]
         public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordDto changePasswordDto)
         {
             await _userService.ChangePassword(changePasswordDto);
             return Ok();
+        }
+
+        /// <summary>
+        /// Update profile.
+        /// </summary>
+        /// <param name="updateProfileDto"></param>
+        /// <returns></returns>
+        /// <response code="200">Returns the updated user.</response>
+        /// <response code="400">If the request is invalid.</response>
+        /// <response code="401">If the user is not authenticated.</response>
+        [HttpPatch]
+        [Route("/profile/update-info")]
+        [Authorize]
+        public async Task<IActionResult> ChangePassword([FromBody] UpdateProfileDto updateProfileDto)
+        {
+            var user = await _userService.UpdateProfile(updateProfileDto);
+            return Ok(user);
         }
     }
 }
