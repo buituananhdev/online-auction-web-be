@@ -201,5 +201,12 @@ namespace OnlineAuctionWeb.Api.Controllers
             var result = await _auctionService.GetBuyerAuctionsHistory(pageNumber, pageSize, searchQuery, status);
             return Ok(result);
         }
+
+        [HttpPatch("{id}/update-predict_avg_price")]
+        public async Task<IActionResult> UpdatePredictAvgPrice(int id, decimal predictAvgPrice)
+        {
+            await _auctionService.UpdatePredictAvgPrice(id, predictAvgPrice);
+            return Ok();
+        }
     }
 }
