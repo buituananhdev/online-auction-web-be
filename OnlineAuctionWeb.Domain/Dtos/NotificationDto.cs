@@ -1,8 +1,9 @@
+using OnlineAuctionWeb.Domain.Common;
 using OnlineAuctionWeb.Domain.Enums;
 
 namespace OnlineAuctionWeb.Domain.Dtos
 {
-    public class NotificationDto
+    public class NotificationDto : BaseDomainEntity
     {
         public int Id { get; set; }
         public string? Title { get; set; }
