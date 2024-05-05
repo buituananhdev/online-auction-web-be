@@ -396,11 +396,14 @@ namespace OnlineAuctionWeb.Application.Services
             auctionDto.IsWatched = _watchListService.IsWatched(auction.Id);
             auctionDto.mediaUrls = _auctionMediaService.GetAuctionMediaUrls(auction.Id);
 
-            var user = await _userService.GetByIdAsync((int)_currentUserService.UserId);
-            if (_currentUserService.UserId != null && user.Role == RoleEnum.Buyer)
+            if (_currentUserService.UserId != null)
             {
-                await _watchListService.AddToWatchListAsync(new CreateWatchListDto(id, WatchListTypeEnum.RecentlyViewed));
-                await _hubService.AddUserToGroupHub(auction.Id, (int)_currentUserService.UserId);
+                var user = await _userService.GetByIdAsync((int)_currentUserService.UserId);
+                if(user.Role == RoleEnum.Buyer)
+                {
+                    await _watchListService.AddToWatchListAsync(new CreateWatchListDto(id, WatchListTypeEnum.RecentlyViewed));
+                    await _hubService.AddUserToGroupHub(auction.Id, (int)_currentUserService.UserId);
+                }
             }
 
             return auctionDto;
