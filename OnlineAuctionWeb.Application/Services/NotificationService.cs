@@ -18,6 +18,7 @@ namespace OnlineAuctionWeb.Application.Services
         Task SendNotificationAsync(int userId, CreateNotificationDto notificationDto);
         Task NewBidNotification(AuctionDto auction, int sellerId);
         Task<List<NotificationDto>> GetListNotifications();
+        Task ReadNotification(int notificationId);
     }
     public class NotificationService : INotificationService
     {
@@ -111,6 +112,29 @@ namespace OnlineAuctionWeb.Application.Services
                     _hubService.SendNotification(sellerId, _mapper.Map<NotificationDto>(sellerNotification)),
                     _hubService.SendGroupNotification(auction.Id, _mapper.Map<NotificationDto>(buyerNotification))
                 );
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+        }
+
+        public async Task ReadNotification(int notificationId)
+        {
+            try
+            {
+                var notification = await _context.Notifications
+                    .Include(x => x.UserNotifications)
+                    .FirstOrDefaultAsync(x => x.Id == notificationId);
+
+                var userNotification = notification.UserNotifications
+                    .FirstOrDefault(x => x.UserId == _currentUserService.UserId);
+
+                if (userNotification != null)
+                {
+                    userNotification.IsRead = true;
+                    await _context.SaveChangesAsync();
+                }
             }
             catch (Exception ex)
             {
