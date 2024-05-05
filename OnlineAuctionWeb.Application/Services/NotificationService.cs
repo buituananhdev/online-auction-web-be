@@ -51,6 +51,7 @@ namespace OnlineAuctionWeb.Application.Services
                         RedirectUrl = notification.RedirectUrl,
                         RelatedID = notification.RelatedID,
                         Type = notification.Type,
+                        DateCreated = notification.DateCreated,
                         IsRead = notification.UserNotifications.Any(un => un.UserId == _currentUserService.UserId && un.IsRead)
                     })
                     .ToListAsync();
