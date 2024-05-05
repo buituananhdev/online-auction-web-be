@@ -48,6 +48,9 @@ namespace OnlineAuctionWeb.Application.Services
                         Id = notification.Id,
                         Title = notification.Title,
                         Content = notification.Content,
+                        RedirectUrl = notification.RedirectUrl,
+                        RelatedID = notification.RelatedID,
+                        Type = notification.Type,
                         IsRead = notification.UserNotifications.Any(un => un.UserId == _currentUserService.UserId && un.IsRead)
                     })
                     .ToListAsync();
