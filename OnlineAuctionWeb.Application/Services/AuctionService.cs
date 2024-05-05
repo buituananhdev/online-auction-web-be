@@ -397,9 +397,8 @@ namespace OnlineAuctionWeb.Application.Services
             if (_currentUserService.UserId != null)
             {
                 await _watchListService.AddToWatchListAsync(new CreateWatchListDto(id, WatchListTypeEnum.RecentlyViewed));
+                await _hubService.AddUserToGroupHub(auction.Id, (int)_currentUserService.UserId);
             }
-
-            await _hubService.AddUserToGroupHub(auction.Id, (int)_currentUserService.UserId);
 
             return auctionDto;
         }
