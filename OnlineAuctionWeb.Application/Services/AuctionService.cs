@@ -48,6 +48,8 @@ namespace OnlineAuctionWeb.Application.Services
             string searchQuery = null,
             BidStatusEnum? status = null
         );
+
+        Task UpdatePredictAvgPrice(int auctionId, decimal predictAvgPrice);
     }
     public class AuctionService : IAuctionService
     {
@@ -614,6 +616,24 @@ namespace OnlineAuctionWeb.Application.Services
             catch (Exception ex)
             {
                 Console.WriteLine("Err", ex.Message);
+                throw;
+            }
+        }
+
+        public async Task UpdatePredictAvgPrice(int auctionId, decimal predictAvgPrice)
+        {
+            try
+            {
+                var auction = await _context.Auctions.FindAsync(auctionId);
+                if(auction == null)
+                {
+                    throw new CustomException(StatusCodes.Status404NotFound, "Auction not found!");
+                }
+
+                auction.PredictAvgPrice = predictAvgPrice;
+                await _context.SaveChangesAsync();
+            } catch (Exception ex)
+            {
                 throw;
             }
         }
