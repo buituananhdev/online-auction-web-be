@@ -24,5 +24,17 @@ namespace OnlineAuctionWeb.Api.Controllers
             var notifications = await _notificationService.GetListNotifications();
             return Ok(notifications);
         }
+
+        /// <summary>
+        /// Read notification.
+        /// </summary>
+        /// <param name="notificationId"></param>
+        /// <returns></returns>
+        [HttpPatch("{notificationId}/read")]
+        public async Task<IActionResult> ReadNotification(int notificationId)
+        {
+            await _notificationService.ReadNotification(notificationId);
+            return Ok();
+        }
     }
 }
