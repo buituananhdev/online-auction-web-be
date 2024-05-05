@@ -272,7 +272,7 @@ namespace OnlineAuctionWeb.Application.Services
         {
             try
             {
-                if(_currentUserService == null)
+                if(_currentUserService.UserId == null)
                 {
                     throw new CustomException(StatusCodes.Status401Unauthorized, "Invalid token!");
                 }
