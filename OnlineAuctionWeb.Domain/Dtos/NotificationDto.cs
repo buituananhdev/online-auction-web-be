@@ -10,5 +10,6 @@ namespace OnlineAuctionWeb.Domain.Dtos
         public string? RedirectUrl { get; set; }
         public int? RelatedID { get; set; }
         public NotificationType Type { get; set; }
+        public bool IsRead { get; set; }
     }
 }

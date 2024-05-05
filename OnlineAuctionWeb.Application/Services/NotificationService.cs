@@ -39,18 +39,26 @@ namespace OnlineAuctionWeb.Application.Services
         {
             try
             {
-                var notifications = await _context.Notifications
+                var notificationDtos = await _context.Notifications
                     .Include(x => x.UserNotifications)
                     .Where(a => a.UserNotifications.Any(un => un.UserId == _currentUserService.UserId))
+                    .Select(notification => new NotificationDto
+                    {
+                        Id = notification.Id,
+                        Title = notification.Title,
+                        Content = notification.Content,
+                        IsRead = notification.UserNotifications.Any(un => un.UserId == _currentUserService.UserId && un.IsRead)
+                    })
                     .ToListAsync();
 
-                return _mapper.Map<List<NotificationDto>>(notifications);
+                return notificationDtos;
             }
             catch (Exception ex)
             {
                 throw;
             }
         }
+
 
         public async Task NewBidNotification(AuctionDto auction, int sellerId)
         {
