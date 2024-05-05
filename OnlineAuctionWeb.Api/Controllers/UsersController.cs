@@ -117,8 +117,7 @@ namespace OnlineAuctionWeb.Api.Controllers
         /// </summary>
         /// <param name="newPassword"></param>
         /// <returns></returns>
-        [HttpPatch]
-        [Route("/profile/change-password")]
+        [HttpPatch("profile/change-password")]
         [Authorize]
         public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordDto changePasswordDto)
         {
@@ -134,8 +133,7 @@ namespace OnlineAuctionWeb.Api.Controllers
         /// <response code="200">Returns the updated user.</response>
         /// <response code="400">If the request is invalid.</response>
         /// <response code="401">If the user is not authenticated.</response>
-        [HttpPatch]
-        [Route("/profile/update-info")]
+        [HttpPatch("profile/update-info")]
         [Authorize]
         public async Task<IActionResult> ChangePassword([FromBody] UpdateProfileDto updateProfileDto)
         {
