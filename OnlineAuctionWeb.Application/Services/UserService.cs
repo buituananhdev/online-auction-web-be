@@ -26,7 +26,7 @@ namespace OnlineAuctionWeb.Application.Services
         Task<bool> UserExistsByEmailAsync(string email);
         Task<int> GetUserRoleByIdAsync(int id);
         Task<UserDto> GetMe();
-        Task ChangePassword(string newPassword);
+        Task ChangePassword(ChangePasswordDto changePasswordDto);
     }
 
     public class UserService : IUserService
@@ -238,17 +238,27 @@ namespace OnlineAuctionWeb.Application.Services
             }
         }
 
-        public async Task ChangePassword(string newPassword)
+        public async Task ChangePassword(ChangePasswordDto changePasswordDto)
         {
             try
             {
-                if(string.IsNullOrEmpty(newPassword))
+                if (string.IsNullOrEmpty(changePasswordDto.CurrentPassword))
+                {
+                    throw new CustomException(StatusCodes.Status400BadRequest, "Please provide old password");
+                }
+
+                if (string.IsNullOrEmpty(changePasswordDto.NewPassword))
                 {
                     throw new CustomException(StatusCodes.Status400BadRequest, "Please provide new password");
                 }
 
                 var user = await _context.Users.FindAsync(_currentUserService.UserId);
-                string hashedPassword = BCrypt.Net.BCrypt.HashPassword(newPassword);
+                if (!BCrypt.Net.BCrypt.Verify(changePasswordDto.CurrentPassword, user.Password))
+                {
+                    throw new CustomException(StatusCodes.Status400BadRequest, "Old password is incorrect");
+                }
+
+                string hashedPassword = BCrypt.Net.BCrypt.HashPassword(changePasswordDto.NewPassword);
                 user.Password = hashedPassword;
                 await _context.SaveChangesAsync();
             } catch (Exception ex)
