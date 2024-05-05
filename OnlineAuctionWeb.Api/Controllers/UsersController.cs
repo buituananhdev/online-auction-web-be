@@ -120,9 +120,9 @@ namespace OnlineAuctionWeb.Api.Controllers
         [HttpPatch]
         [Route("change-password")]
         [Authorize]
-        public async Task<IActionResult> ChangePassword([FromBody] string newPassword)
+        public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordDto changePasswordDto)
         {
-            await _userService.ChangePassword(newPassword);
+            await _userService.ChangePassword(changePasswordDto);
             return Ok();
         }
     }
