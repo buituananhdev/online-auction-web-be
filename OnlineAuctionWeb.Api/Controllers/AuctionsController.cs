@@ -163,21 +163,23 @@ namespace OnlineAuctionWeb.Api.Controllers
         /// <summary>
         /// Retrieves the auction history for the seller.
         /// </summary>
+        /// <param name="id">Optional. The seller's ID.</param>
         /// <param name="pageNumber">The page number for pagination.</param>
         /// <param name="pageSize">The size of each page.</param>
         /// <param name="searchQuery">Optional. A search query to filter auctions by name or description.</param>
         /// <param name="status">Optional. Filters auctions by their status.</param>
         /// <returns>Returns the auction history for the seller.</returns>
-        [HttpGet("seller-history")]
-        [RolesAuthorize(RequiredRoles = new RoleEnum[] { RoleEnum.Seller })]
+        [HttpGet("seller-history", Name = "GetSellerAuctionsHistory")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> GetSellerAuctionsHistory(
+            int? id = null,
             int pageNumber = 1,
             int pageSize = 10,
             string searchQuery = null,
             ProductStatusEnum? status = null
         )
         {
-            var result = await _auctionService.GetSellerAuctionsHistory(pageNumber, pageSize, searchQuery, status);
+            var result = await _auctionService.GetSellerAuctionsHistory(id, pageNumber, pageSize, searchQuery, status);
             return Ok(result);
         }
 
