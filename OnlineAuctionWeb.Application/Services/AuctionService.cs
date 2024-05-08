@@ -37,6 +37,7 @@ namespace OnlineAuctionWeb.Application.Services
         Task<List<AuctionDto>> GetListRecentlyViewedAsync();
         Task<List<AuctionDto>> GetTop10Auctions();
         Task<PaginatedResult<AuctionDto>> GetSellerAuctionsHistory(
+            int? id,
             int pageNumber,
             int pageSize,
             string searchQuery = null,
@@ -457,6 +458,7 @@ namespace OnlineAuctionWeb.Application.Services
         }
 
         public async Task<PaginatedResult<AuctionDto>> GetSellerAuctionsHistory(
+            int? id,
             int pageNumber,
             int pageSize,
             string searchQuery = null,
@@ -465,12 +467,12 @@ namespace OnlineAuctionWeb.Application.Services
         {
             try
             {
-                if (_currentUserService.UserId == null)
+                int userId = id ?? (int)_currentUserService.UserId;
+
+                if (userId == null)
                 {
                     throw new CustomException(StatusCodes.Status401Unauthorized, "Invalid token!");
                 }
-
-                int userId = (int)_currentUserService.UserId;
 
                 var query = _context.Auctions
                     .Include(a => a.Bids) // Include bids related to auction
