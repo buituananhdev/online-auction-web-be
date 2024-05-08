@@ -36,5 +36,25 @@ namespace OnlineAuctionWeb.Api.Controllers
             await _feedbackService.CreateAsync(createFeedBackDto);
             return StatusCode(StatusCodes.Status201Created);
         }
+
+        /// <summary>
+        /// Get feedbacks by user id
+        /// </summary>
+        /// <param name="id">The user id</param>
+        /// <returns></returns>
+        /// <response code="200">Returns when the feedbacks are found</response>
+        /// <response code="400">Returns when the user id is invalid</response>
+        /// <response code="500">Returns when there is an internal server error</response>
+        /// <response code="401">Returns when the user is not authenticated</response>
+        [HttpGet("{id}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        public async Task<IActionResult> GetAsync(int id)
+        {
+            var feedbacks = await _feedbackService.GetFeedBackByUserId(id);
+            return Ok(feedbacks);
+        }
     }
 }
