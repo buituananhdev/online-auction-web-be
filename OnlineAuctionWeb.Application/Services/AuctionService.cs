@@ -89,9 +89,9 @@ namespace OnlineAuctionWeb.Application.Services
                     throw new CustomException(StatusCodes.Status404NotFound, "Auction not found!");
                 }
 
-                if (auction.UserId != _currentUserService.UserId || _currentUserService.Role != "Admin")
+                if (auction.UserId != _currentUserService.UserId && _currentUserService.Role != "Admin")
                 {
-                    throw new CustomException(StatusCodes.Status401Unauthorized, "You are not authorized to change the status of this auction!");
+                    throw new CustomException(StatusCodes.Status403Forbidden, "You are not authorized to change the status of this auction!");
                 }
 
                 auction.ProductStatus = status;

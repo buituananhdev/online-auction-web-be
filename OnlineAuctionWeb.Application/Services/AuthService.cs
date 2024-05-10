@@ -20,6 +20,7 @@ namespace OnlineAuctionWeb.Application.Services
         Task<TokenPayload> Login(LoginDto loginDto);
         Task Register(RegisterDto registerDto);
         Task<TokenPayload> AuthWithGoogle(string googleToken, RoleEnum role);
+        Task<bool> ForgotPassword(string email);
     }
     public class AuthService : IAuthService
     {
@@ -27,12 +28,14 @@ namespace OnlineAuctionWeb.Application.Services
         private readonly IConfiguration _configuration;
         private readonly IMapper _mapper;
         private readonly DataContext _context;
-        public AuthService(IUserService userService, IConfiguration configuration, IMapper mapper, DataContext context)
+    private readonly IEmailService _emailService;
+        public AuthService(IUserService userService, IConfiguration configuration, IMapper mapper, DataContext context, IEmailService emailService)
         {
             _userService = userService;
             _configuration = configuration;
             _mapper = mapper;
             _context = context;
+            _emailService = emailService;
         }
 
         public async Task<TokenPayload> AuthWithGoogle(string googleToken, RoleEnum role)
@@ -64,6 +67,31 @@ namespace OnlineAuctionWeb.Application.Services
 
             var tokenPayload = JwtUtil.GenerateAccessToken(_mapper.Map<UserDto>(existingUser), _configuration);
             return tokenPayload;
+        }
+
+        public async Task<bool> ForgotPassword(string email)
+        {
+            try {
+                var user = _userService.FindUserByEmailAsync(email);
+                if (user == null)
+                {
+                    throw new CustomException(StatusCodes.Status404NotFound, "User not found!");
+                }
+                var tokenPayload = JwtUtil.GenerateAccessToken(_mapper.Map<UserDto>(user), _configuration);
+
+                var mailData = new MailData
+                {
+                    EmailToId = email,
+                    EmailToName = user.FullName,
+                    EmailSubject = "Forgot Password",
+                    EmailBody = $"Click the link to reset your password: {tokenPayload.AccessToken}"
+                };
+
+                return await _emailService.SendMailAsync(mailData);
+            }
+            catch (Exception ex) {
+                throw;
+            }
         }
 
         public async Task<TokenPayload> Login(LoginDto loginDto)
