@@ -6,5 +6,6 @@ namespace OnlineAuctionWeb.Domain.Dtos
     {
         [Required(ErrorMessage = "Category Name is required")]
         public string CategoryName { get; set; }
+        public string? ImageUrl { get; set; }
     }
 }
