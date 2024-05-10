@@ -155,8 +155,8 @@ namespace OnlineAuctionWeb.Api.Controllers
         [Authorize]
         public async Task<IActionResult> UpdateAvatar([FromBody] string imageUrl)
         {
-            var user = await _userService.ChangeProfileImage(imageUrl);
-            return Ok(user);
+            await _userService.ChangeProfileImage(imageUrl);
+            return Ok();
         }
 
         /// <summary>
