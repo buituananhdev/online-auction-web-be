@@ -15,14 +15,16 @@ namespace OnlineAuctionWeb.Api.Controllers
     public class UsersController : ControllerBase
     {
         private readonly IUserService _userService;
+        private readonly IEmailService _emailService;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="UsersController"/> class.
         /// </summary>
         /// <param name="userService">The user service.</param>
-        public UsersController(IUserService userService)
+        public UsersController(IUserService userService, IEmailService emailService)
         {
             _userService = userService;
+            _emailService = emailService;
         }
 
         /// <summary>
@@ -139,6 +141,35 @@ namespace OnlineAuctionWeb.Api.Controllers
         {
             var user = await _userService.UpdateProfile(updateProfileDto);
             return Ok(user);
+        }
+
+        /// <summary>
+        /// Update avatar.
+        /// </summary>
+        /// <param name="imageUrl"></param>
+        /// <returns></returns>
+        /// <response code="200">Returns the updated user.</response>
+        /// <response code="400">If the request is invalid.</response>
+        /// <response code="401">If the user is not authenticated.</response>
+        [HttpPatch("profile/update-avatar")]
+        [Authorize]
+        public async Task<IActionResult> UpdateAvatar([FromBody] string imageUrl)
+        {
+            await _userService.ChangeProfileImage(imageUrl);
+            return Ok();
+        }
+
+        /// <summary>
+        /// Send mail.
+        /// </summary>
+        /// <param name="mailData"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("SendMail")]
+        public async Task<IActionResult> SendMail(MailData mailData)
+        {
+            var isSend = await _emailService.SendMailAsync(mailData);
+            return Ok(isSend);
         }
     }
 }

@@ -24,6 +24,7 @@ namespace OnlineAuctionWeb.Application
             services.AddScoped<IFeedbackService, FeedbackService>();
             services.AddScoped<IAuctionMediaService, AuctionMediaService>();
             services.AddScoped<IPaymentService, PaymentService>();
+            services.AddTransient<IEmailService, EmailService>();
             services.AddHttpContextAccessor();
 
             var key = Encoding.ASCII.GetBytes(configration.GetSection("JwtSettings:Secret").Value!);
