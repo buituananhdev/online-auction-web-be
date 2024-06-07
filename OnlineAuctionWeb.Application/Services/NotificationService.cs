@@ -54,6 +54,7 @@ namespace OnlineAuctionWeb.Application.Services
                         DateCreated = notification.DateCreated,
                         IsRead = notification.UserNotifications.Any(un => un.UserId == _currentUserService.UserId && un.IsRead)
                     })
+                    .OrderByDescending(x => x.DateCreated)
                     .ToListAsync();
 
                 return notificationDtos;

@@ -31,14 +31,16 @@ namespace OnlineAuctionWeb.Application.Services
         private readonly IMapper _mapper;
         private readonly IFeedbackService _feedbackService;
         private readonly IUserService _userService;
+        private readonly IAuctionMediaService _auctionMediaService;
 
-        public WatchListService(DataContext context, ICurrentUserService currentUserService, IMapper mapper, IFeedbackService feedbackService, IUserService userService)
+        public WatchListService(DataContext context, ICurrentUserService currentUserService, IMapper mapper, IFeedbackService feedbackService, IUserService userService, IAuctionMediaService auctionMediaService)
         {
             _context = context;
             _currentUserService = currentUserService;
             _mapper = mapper;
             _feedbackService = feedbackService;
             _userService = userService;
+            _auctionMediaService = auctionMediaService;
         }
 
         public async Task AddToWatchListAsync(CreateWatchListDto createWatchListDto)
@@ -158,6 +160,7 @@ namespace OnlineAuctionWeb.Application.Services
                     auctionDto.User = _mapper.Map<UserDto>(auction.User);
                     auctionDto.User.ratings = _feedbackService.GetAverageRatingByUserId(auction.UserId);
                     auctionDto.Category = _mapper.Map<CategoryDto>(auction.Category);
+                    auctionDto.mediaUrls = _auctionMediaService.GetAuctionMediaUrls(auction.Id);
                     auctionDtos.Add(auctionDto);
                 }
 
