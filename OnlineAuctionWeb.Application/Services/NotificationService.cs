@@ -17,6 +17,7 @@ namespace OnlineAuctionWeb.Application.Services
     {
         Task SendNotificationAsync(int userId, CreateNotificationDto notificationDto);
         Task NewBidNotification(AuctionDto auction, int sellerId);
+        Task NewPaymentNotification(AuctionDto payment, int sellerId);
         Task<List<NotificationDto>> GetListNotifications();
         Task ReadNotification(int notificationId);
     }
@@ -119,6 +120,37 @@ namespace OnlineAuctionWeb.Application.Services
                 );
             }
             catch (Exception ex)
+            {
+                throw;
+            }
+        }
+
+        public async Task NewPaymentNotification(AuctionDto auction, int sellerId)
+        {
+            try
+            {
+                var notificationDto = new CreateNotificationDto
+                {
+                    Title = "Payment Confirmation: Auction Sold!",
+                    Content = $"Congratulations! Your auction has been successfully paid for by the customer.",
+                    RedirectUrl = $"/seller-history/{auction.Id}",
+                    RelatedID = auction.Id,
+                    Type = NotificationType.NewPayment,
+                };
+                var notification = _mapper.Map<Notification>(notificationDto);
+                _context.Notifications.Add(notification);
+                await _context.SaveChangesAsync();
+
+                _context.UserNotifications.Add(new UserNotification
+                {
+                    UserId = sellerId,
+                    NotificationId = notification.Id,
+                    IsRead = false
+                });
+
+                await _context.SaveChangesAsync();
+                await _hubService.SendNotification(sellerId, _mapper.Map<NotificationDto>(notification));
+            } catch (Exception ex)
             {
                 throw;
             }
