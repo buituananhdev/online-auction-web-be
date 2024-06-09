@@ -51,6 +51,7 @@ namespace OnlineAuctionWeb.Application.Services
         );
 
         Task UpdatePredictAvgPrice(int auctionId, decimal predictAvgPrice);
+        Task<SellerRevenuePayload> GetSellerRevenue();
     }
     public class AuctionService : IAuctionService
     {
@@ -302,25 +303,35 @@ namespace OnlineAuctionWeb.Application.Services
                         a.Description.Contains(searchQuery)
                     );
                 }
+                if(status != null)
+                {
+                    if (status == BidStatusEnum.Win)
+                    {
+                        var winningAuctionIds = await _context.Bids
+                            .Where(b => b.UserId == userId)
+                            .GroupBy(b => b.AuctionId)
+                            .Select(g => g.OrderByDescending(b => b.BidAmount).FirstOrDefault().AuctionId)
+                            .Where(auctionId => _context.Auctions.Any(a => a.Id == auctionId && a.EndTime < DateTime.Now))
+                            .ToListAsync();
 
-                if (status == BidStatusEnum.Winning)
-                {
-                    var winningAuctionIds = await _context.Bids
-                        .Where(b => b.UserId == userId)
-                        .GroupBy(b => b.AuctionId)
-                        .Select(g => g.OrderByDescending(b => b.BidAmount).FirstOrDefault().AuctionId)
-                        .Where(auctionId => _context.Auctions.Any(a => a.Id == auctionId && a.EndTime < DateTime.Now))
-                        .ToListAsync();
+                        query = query.Where(a => winningAuctionIds.Contains(a.Id));
+                    }
+                    else if (status == BidStatusEnum.InProgress)
+                    {
+                        query = query.Where(a => a.EndTime > DateTime.Now && a.ProductStatus == ProductStatusEnum.InProgess);
+                    }
+                    else if (status == BidStatusEnum.Lose)
+                    {
+                        var winningAuctionIds = await _context.Bids
+                            .Where(b => b.UserId == userId)
+                            .GroupBy(b => b.AuctionId)
+                            .Select(g => g.OrderByDescending(b => b.BidAmount).FirstOrDefault().AuctionId)
+                            .Where(auctionId => _context.Auctions.Any(a => a.Id == auctionId && a.EndTime < DateTime.Now))
+                            .ToListAsync();
 
-                     query = query.Where(a => winningAuctionIds.Contains(a.Id));
-                }
-                else if (status == BidStatusEnum.InProgress)
-                {
-                    query = query.Where(a => a.EndTime > DateTime.Now);
-                }
-                else if (status == BidStatusEnum.Lost)
-                {
-                    query = query.Where(a => a.EndTime < DateTime.Now);
+                        query = query.Where(a => !winningAuctionIds.Contains(a.Id));
+                        query = query.Where(a => a.EndTime < DateTime.Now && (a.ProductStatus == ProductStatusEnum.Ended || a.ProductStatus == ProductStatusEnum.Canceled));
+                    }
                 }
 
                 var totalAuctions = await query.CountAsync();
@@ -492,6 +503,13 @@ namespace OnlineAuctionWeb.Application.Services
                 if (status != null)
                 {
                     query = query.Where(a => a.ProductStatus == status);
+                    if (status == ProductStatusEnum.Ended)
+                    {
+                          query = query.Where(a => a.EndTime < DateTime.Now || a.ProductStatus == ProductStatusEnum.Canceled);
+                    } else if (status == ProductStatusEnum.InProgess)
+                    {
+                        query = query.Where(a => a.EndTime > DateTime.Now && a.ProductStatus != ProductStatusEnum.Canceled);
+                    }
                 }
 
                 var totalAuctions = await query.CountAsync();
@@ -533,6 +551,43 @@ namespace OnlineAuctionWeb.Application.Services
             catch (Exception ex)
             {
                 Console.WriteLine("Err: " + ex.Message);
+                throw;
+            }
+        }
+
+        public async Task<SellerRevenuePayload> GetSellerRevenue()
+        {
+            try
+            {
+                if(_currentUserService.Role != RoleEnum.Seller.ToString())
+                {
+                    throw new CustomException(StatusCodes.Status403Forbidden, "You are not authorized to view this information!");
+                }
+
+                var auctions = await _context.Auctions
+                    .Include(a => a.Bids)
+                    .ThenInclude(b => b.Payment)
+                    .Where(a => a.UserId == _currentUserService.UserId).ToListAsync();
+                var totalAuctions = auctions.Count;
+                var soldAuctions = auctions.Where(a => a.Bids.Any(b => b.Payment != null)).ToList();
+                var totalSoldAuctions = soldAuctions.Count;
+
+                var totalRevenue = soldAuctions
+                           .SelectMany(a => a.Bids)
+                           .Where(b => b.Payment != null)
+                           .Sum(b => b.Payment.Amount ?? 0);
+
+                var sellerRevenuePayload = new SellerRevenuePayload
+                {
+                    TotalAuctions = totalAuctions,
+                    TotalSoldAuctions = totalSoldAuctions,
+                    TotalRevenue = totalRevenue
+                };
+
+                return sellerRevenuePayload;
+            }
+            catch
+            {
                 throw;
             }
         }
