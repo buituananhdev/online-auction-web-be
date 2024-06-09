@@ -24,7 +24,7 @@ namespace OnlineAuctionWeb.Domain.Dtos
         public Int32 ViewCount { get; set; }
         public decimal PredictAvgPrice { get; set; }
         public bool IsWatched { get; set; }
-        public UserDto User { get; set; }
+        public UserDto? User { get; set; }
         public CategoryDto Category { get; set; }
         public List<string>? mediaUrls { get; set; }
     }

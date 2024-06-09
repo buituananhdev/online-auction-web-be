@@ -486,9 +486,12 @@ namespace OnlineAuctionWeb.Application.Services
                 }
 
                 var query = _context.Auctions
-                    .Include(a => a.Bids) // Include bids related to auction
                     .Include(a => a.User) // Include seller information
                     .Include(a => a.Category) // Include category information
+                    .Include(a => a.Bids)
+                    .ThenInclude(b => b.User)
+                    .Include(a => a.Bids)
+                    .ThenInclude(b => b.Payment)
                     .Where(a => a.UserId == userId)
                     .AsQueryable();
 
@@ -502,13 +505,17 @@ namespace OnlineAuctionWeb.Application.Services
 
                 if (status != null)
                 {
-                    query = query.Where(a => a.ProductStatus == status);
-                    if (status == ProductStatusEnum.Ended)
+                    switch (status)
                     {
-                          query = query.Where(a => a.EndTime < DateTime.Now || a.ProductStatus == ProductStatusEnum.Canceled);
-                    } else if (status == ProductStatusEnum.InProgess)
-                    {
-                        query = query.Where(a => a.EndTime > DateTime.Now && a.ProductStatus != ProductStatusEnum.Canceled);
+                        case ProductStatusEnum.Ended:
+                            query = query.Where(a => a.EndTime < DateTime.Now || a.ProductStatus == ProductStatusEnum.Canceled || a.ProductStatus == ProductStatusEnum.Ended);
+                            break;
+                        case ProductStatusEnum.InProgess:
+                            query = query.Where(a => a.EndTime > DateTime.Now && a.ProductStatus != ProductStatusEnum.Canceled && a.ProductStatus != ProductStatusEnum.Ended);
+                            break;
+                        case ProductStatusEnum.Canceled:
+                            query = query.Where(a => a.ProductStatus == ProductStatusEnum.Canceled);
+                            break;
                     }
                 }
 
@@ -521,13 +528,20 @@ namespace OnlineAuctionWeb.Application.Services
                     .ToListAsync();
 
                 var totalPages = (int)Math.Ceiling((double)totalAuctions / pageSize);
-
                 var auctionDtos = auctions.Select(auction =>
                 {
                     var auctionDto = _mapper.Map<AuctionDto>(auction);
                     auctionDto.BidCount = auction.Bids.Count();
-                    auctionDto.User = _mapper.Map<UserDto>(auction.User);
-                    auctionDto.User.ratings = _feedbackService.GetAverageRatingByUserId(auction.UserId);
+                    auctionDto.User = null;
+
+                    foreach (var bid in auction.Bids)
+                    {
+                        if (bid.Payment != null)
+                        {
+                            auctionDto.User = _mapper.Map<UserDto>(bid.User);
+                            break;
+                        }
+                    }
                     auctionDto.Category = _mapper.Map<CategoryDto>(auction.Category);
                     auctionDto.mediaUrls = _auctionMediaService.GetAuctionMediaUrls(auction.Id);
                     return auctionDto;
