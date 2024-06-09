@@ -15,6 +15,5 @@ namespace OnlineAuctionWeb.Domain.Dtos
         public string? TransactionNumber { get; set; }
         public string? Bank { get; set; }
         public decimal? Amount { get; set; }
-        public DateTime PaymentDate { get; set; }
     }
 }

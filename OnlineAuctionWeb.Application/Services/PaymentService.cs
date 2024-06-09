@@ -45,15 +45,8 @@ namespace OnlineAuctionWeb.Application.Services
 
                 var auction = await _bidService.GetAuctionByBidIDAsync(createPaymentDto.BidId);
 
-                var notificationDto = new CreateNotificationDto
-                {
-                    Title = "Payment Confirmation: Auction Sold!",
-                    Content = $"Congratulations! Your auction has been successfully paid for by the customer.",
-                    RedirectUrl = $"/seller-history/{auction.Id}",
-                    RelatedID = auction.Id,
-                    Type = NotificationType.NewPayment,
-                };
-                await _notificationService.SendNotificationAsync(auction.User.Id, notificationDto);
+
+                await _notificationService.NewPaymentNotification(auction, auction.User.Id);
             }
             catch (Exception ex)
             {
