@@ -47,8 +47,8 @@ namespace OnlineAuctionWeb.Api.Controllers
         [RolesAuthorize(RequiredRoles = new RoleEnum[] { RoleEnum.Buyer })]
         public async Task<IActionResult> CreateBid([FromBody] CreateBidDto bidDto)
         {
-            await _bidService.CreateAsync(bidDto);
-            return StatusCode(201);
+            var result = await _bidService.CreateAsync(bidDto);
+            return Ok(result);
         }
     }
 }
