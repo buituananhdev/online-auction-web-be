@@ -14,7 +14,7 @@ namespace OnlineAuctionWeb.Application.Services
     {
         Task<PaginatedResult<BidDto>> GetAllAsync(int pageNumber, int pageSize);
         Task<AuctionDto> GetAuctionByBidIDAsync(int bidId);
-        Task CreateAsync(CreateBidDto bidDto);
+        Task<BidDto> CreateAsync(CreateBidDto bidDto);
     }
 
     public class BidService : IBidService
@@ -40,7 +40,7 @@ namespace OnlineAuctionWeb.Application.Services
             _hubService = hubService;
         }
 
-        public async Task CreateAsync(CreateBidDto bidDto)
+        public async Task<BidDto> CreateAsync(CreateBidDto bidDto)
         {
             try
             {
@@ -75,6 +75,8 @@ namespace OnlineAuctionWeb.Application.Services
                 
                 await _hubService.AddUserToGroupHub(auction.Id, (int)_currentUserService.UserId);
                 await _notificationService.NewBidNotification(auction, auction.User.Id);
+
+                return _mapper.Map<BidDto>(bid);
             }
             catch (Exception ex)
             {
