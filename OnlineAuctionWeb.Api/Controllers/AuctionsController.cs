@@ -210,5 +210,12 @@ namespace OnlineAuctionWeb.Api.Controllers
             await _auctionService.UpdatePredictAvgPrice(id, predictAvgPrice);
             return Ok();
         }
+
+        [HttpGet("seller-revenue")]
+        public async Task<IActionResult> GetSellerRevenue()
+        {
+            var result = await _auctionService.GetSellerRevenue();
+            return Ok(result);
+        }
     }
 }

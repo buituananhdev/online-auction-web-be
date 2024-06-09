@@ -39,8 +39,8 @@
     public enum BidStatusEnum
     {
         InProgress = 1,
-        Winning = 2,
-        Lost = 3
+        Win = 2,
+        Lose = 3
     }
 
     public enum NotificationType
